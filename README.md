@@ -34,3 +34,15 @@ Individuals who want to track their daily, weekly, monthly, or yearly spending a
 * **Export Functionality:** Enables users to export analysis results (e.g., as an image) for local saving.
 
 This description can be used in your project repository's README file or as part of your project documentation. Remember to fill in the "Technologies" section once you have made those decisions.
+
+## Team Members
+
+| UWA ID    | name              | Github user name |
+|-----------|-------------------|------------------|
+| 24254189  | Anandhu Raveendran| anandhur26       |
+| 24071442  | Jiawen Xu         | Jwxxi            |
+| 23901307  | Peiyu Yu          | YUPeiyu123       |
+| 24116864  | Zixiao Ma         | CrazyDave0522    |
+
+##  [To Be Edited]instructions for how to launch the application.
+## [To Be Edited]instructions for how to run the tests for the application.
