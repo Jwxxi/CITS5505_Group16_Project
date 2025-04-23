@@ -1,47 +1,36 @@
 # CITS5505_Group16_Project
 
-# April 17th Meeting Minutes
 
-**Project Name:** Expense Tracker (CITS5505 Group Project)
-**Date:** April 17th 2025
-**Time:** 3pm
-**Location:** Reid Library
 
-**Attendees:**
-* Zixiao Ma
-* Jiawen Xu
+## Project Name
+Expense Tracker (CITS5505 Group Project)
 
-**Meeting Topic:** First Project Planning Meeting - Defining Core Features and Structure for the Expense Tracker Project
+## Overview
+This project is a web-based Expense Tracker application designed to help users manage and visualize their personal income and expenses. The application provides core functionalities for recording financial transactions, analyzing spending habits through charts and lists, and sharing/exporting data.
 
-**Meeting Objective:**
-* To discuss and preliminarily define the key functional modules of the Expense Tracker project.
-* To clarify the basic structure and user flow of the project.
+## Target Audience
+Individuals who want to track their daily, weekly, monthly, or yearly spending and income to better understand their financial situation and make informed decisions.
 
-**Discussion Points:**
+## Key Features
 
-This meeting focused on discussing the core functional modules of the Expense Tracker project, reaching initial consensus as outlined in the project plan diagram:
+### 1. User Onboarding
+* **User Registration:** Allows new users to create an account.
+* **User Login:** Enables existing users to access their expense data.
+* **Application Description:** Provides an introductory overview of the application's purpose and how to use it.
 
-### User Onboarding:
-* The application needs to implement a Login function.
-* The application needs to implement a Register function.
-* There should be a description on the page to help users understand the application.
+### 2. Income/Expense Recording
+* **Add Transaction:** Users can record new income or expense items.
+* **Remove Transaction:** Users can delete existing transaction records.
+* **Transaction Details:** Each recorded item includes essential information such as Name, Category, Amount, and Date.
 
-### Income/Expense Recording:
-* The core functionality includes the ability to add/remove an item of expense.
-* Each expense item should include the following details:
-    * name
-    * category
-    * amount
-    * date
+### 3. Data Analysis
+* **Category-based Pie Chart:** Visual representation of spending distribution across different categories.
+* **Time-based Line Chart:** Illustrates spending trends over a selected period.
+* **Expense List View:** Displays a detailed list of transactions, with options to sort (e.g., by highest expense) and filter by time frame.
 
-### Analysis:
-* Provide data analysis features to help users understand their spending:
-    * **Pie chart:** To show expense distribution by category.
-    * **Line chart:** To display spending trends within a time frame.
-    * **Expense list:** To show all expense records, sortable by amount with the highest expense one on top, and filterable within a time frame.
+### 4. Data Sharing & Export
+* **Share Analysis:** Allows users to share their analysis results (charts, lists).
+* **Timeframe Selection:** Users can select a specific period for the data to be shared.
+* **Export Functionality:** Enables users to export analysis results (e.g., as an image) for local saving.
 
-### Share Data:
-* Provide a sharing function for each analysis result.
-* Users can click 'share'.
-* Users can select a timeframe for sharing.
-* Users can click 'export' to generate an image and download to local.
+This description can be used in your project repository's README file or as part of your project documentation. Remember to fill in the "Technologies" section once you have made those decisions.
