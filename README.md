@@ -33,7 +33,6 @@ Individuals who want to track their daily, weekly, monthly, or yearly spending a
 * **Timeframe Selection:** Users can select a specific period for the data to be shared.
 * **Export Functionality:** Enables users to export analysis results (e.g., as an image) for local saving.
 
-This description can be used in your project repository's README file or as part of your project documentation. Remember to fill in the "Technologies" section once you have made those decisions.
 
 ## Team Members
 
