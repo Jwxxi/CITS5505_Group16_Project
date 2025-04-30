@@ -153,6 +153,11 @@ body {
   background-color: rgba(0, 0, 0, 0.02);
 }
 
+.input-focused {
+  transform: translateY(-5px);
+  transition: all 0.3s ease;
+}
+
 .custom-input::placeholder {
   color: #aaa;
 }
@@ -212,7 +217,7 @@ body {
 }
 
 /* Responsive adjustments */
-@media (max-width: 767.98px) {
+@media (max-width: 768px) {
   body {
     background-color: #f5f2ed;
   }
@@ -228,5 +233,9 @@ body {
   .footer .text-md-end {
     text-align: center !important;
     margin-top: 10px;
+  }
+  
+  .shape {
+    display: none;
   }
 }

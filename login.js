@@ -104,4 +104,12 @@ document.addEventListener("DOMContentLoaded", function () {
       `;
     document.head.appendChild(styleSheet);
   }
+  // add password strength validation
+  const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+  if (!passwordRegex.test(userData.password)) {
+    alert(
+      "Password must contain at least 8 characters with letters and numbers"
+    );
+    return;
+  }
 });
