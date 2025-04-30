@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Expense Tracker - My Analysis</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="/">Expense Tracker</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse justify-content-between" id="navbarNav">
+      <ul class="navbar-nav mx-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/">My Transactions</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" href="/analysis">My Analysis</a>
+        </li>
+      </ul>
+      <ul class="navbar-nav">
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+            {{ current_user.name }}
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="#">Change Password</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('logout') }}">Sign Out</a></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container my-5">
+
+  <!-- Summary -->
+  <div class="row text-white text-center mb-5">
+    <div class="col-md-4">
+      <div class="card p-3 bg-dark">
+        <h5>Total Income</h5>
+        <p>${{ monthly_income }}</p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card p-3 bg-dark">
+        <h5>Total Expenses</h5>
+        <p>${{ total_expense }}</p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card p-3 bg-dark">
+        <h5>Remaining Balance</h5>
+        <p>${{ balance }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Monthly Trends Table -->
+  <div class="card bg-dark text-white p-3 mb-5">
+    <h5 class="mb-3">Monthly Trends</h5>
+    <div class="table-responsive">
+      <table class="table table-dark table-striped">
+        <thead><tr><th>Month</th><th>Total Spent</th><th>Most Spent On</th><th>Transactions</th></tr></thead>
+        <tbody>
+          {% for row in trend_table %}
+          <tr>
+            <td>{{ row.month }}</td>
+            <td>${{ row.total }}</td>
+            <td>{{ row.top_category }}</td>
+            <td>{{ row.count }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Visual Charts -->
+  <div class="row mb-5">
+    <div class="col-md-6">
+      <div class="card p-3 bg-dark">
+        <h5 class="text-center text-white">Monthly Expense Chart</h5>
+        <canvas id="monthlyChart"></canvas>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card p-3 bg-dark">
+        <h5 class="text-center text-white">Category-wise Breakdown</h5>
+        <canvas id="categoryChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Insights -->
+  <div class="row mb-5">
+    <div class="col-md-6">
+      <div class="card p-3 bg-dark text-white">
+        <h5>Top 3 Spending Categories</h5>
+        <ol>
+          {% for cat, amt in top_categories %}
+          <li>{{ cat }} - ${{ amt }}</li>
+          {% endfor %}
+        </ol>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card p-3 bg-dark text-white">
+        <h5>Highest Spending Month</h5>
+        <p>{{ highest_spend_month[0] }} - ${{ highest_spend_month[1] }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Budget Efficiency Indicator -->
+  <div class="card p-3 bg-dark text-white mb-5">
+    <h5>Budget Efficiency</h5>
+    <p>
+      {% if (total_expense / monthly_income) * 100 < 50 %}✅ Excellent spending control
+      {% elif (total_expense / monthly_income) * 100 < 80 %}⚠️ Moderate usage
+      {% else %}🔴 Warning: High spending
+      {% endif %}
+    </p>
+  </div>
+
+  <!-- Expense vs Income Progress -->
+  <div class="card p-4 bg-dark text-white mb-5">
+    <h5>Expense vs Income</h5>
+    <div class="progress">
+      <div class="progress-bar bg-danger" role="progressbar" style="width: {{ (total_expense / monthly_income) * 100 }}%" aria-valuenow="{{ (total_expense / monthly_income) * 100 }}" aria-valuemin="0" aria-valuemax="100">
+        {{ (total_expense / monthly_income) * 100 | round(1) }}% Used
+      </div>
+    </div>
+  </div>
+
+  <!-- Personal Insight Suggestions -->
+  <div class="card p-3 bg-dark text-white">
+    <h5>Suggestions</h5>
+    <ul>
+      <li>Your most expensive transaction was ${{ most_exp.amount }} on {{ most_exp.category }} ({{ most_exp.date.strftime('%B %d') }})</li>
+      <li>If you cut your biggest category ({{ top_categories[0][0] }}) by 20%, you could save ${{ (top_categories[0][1] * 0.2) | round(2) }}</li>
+    </ul>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Monthly Line Chart
+new Chart(document.getElementById('monthlyChart'), {
+  type: 'line',
+  data: {
+    labels: {{ monthly_totals.keys() | list | tojson }},
+    datasets: [{
+      label: 'Expenses',
+      data: {{ monthly_totals.values() | list | tojson }},
+      backgroundColor: 'rgba(54, 162, 235, 0.2)',
+      borderColor: 'rgba(54, 162, 235, 1)',
+      borderWidth: 2,
+      tension: 0.4
+    }]
+  },
+  options: {
+    plugins: { legend: { labels: { color: 'white' } } },
+    scales: {
+      x: { ticks: { color: 'white' } },
+      y: { ticks: { color: 'white' } }
+    }
+  }
+});
+
+// Category Pie Chart
+new Chart(document.getElementById('categoryChart'), {
+  type: 'pie',
+  data: {
+    labels: {{ category_totals.keys() | list | tojson }},
+    datasets: [{
+      data: {{ category_totals.values() | list | tojson }},
+      backgroundColor: [
+        '#FF6384', '#36A2EB', '#FFCE56',
+        '#4BC0C0', '#9966FF', '#FF9F40',
+        '#C9CBCF', '#7CB342', '#AB47BC', '#26A69A'
+      ]
+    }]
+  },
+  options: {
+    plugins: { legend: { labels: { color: 'white' } } }
+  }
+});
+</script>
+</body>
+</html>

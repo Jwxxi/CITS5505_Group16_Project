@@ -1,0 +1,94 @@
+/* General body styling */
+body {
+    margin: 0;
+    padding: 0;
+    background: url('../static/bg.png') no-repeat center center fixed;
+    background-size: cover;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    min-height: 100vh;
+    color: #ffffff;
+}
+
+/* Navbar, Card, Modal backgrounds */
+.navbar, .card, .modal-content {
+    background: rgba(0, 0, 0, 0.8) !important;
+    color: #ffffff;
+}
+
+/* Table */
+.table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+.table-striped > tbody > tr:nth-of-type(even) {
+    background-color: rgba(255, 255, 255, 0.02);
+}
+.table th, .table td {
+    color: #ffffff;
+}
+
+/* Buttons */
+.btn-primary {
+    background-color: #6c63ff;
+    border: none;
+}
+.btn-primary:hover {
+    background-color: #5848c2;
+}
+.btn-warning, .btn-danger, .btn-outline-light {
+    color: #fff;
+}
+
+/* Toast */
+.toast {
+    background-color: #4CAF50;
+    border-radius: 10px;
+    font-size: 0.9rem;
+}
+
+/* Input Fields */
+input[type="text"], input[type="number"], input[type="date"], select {
+    background-color: rgba(255, 255, 255, 0.9);
+    color: #333;
+}
+
+/* Forms and Modal Forms */
+.modal-content form input {
+    background-color: rgba(255, 255, 255, 0.9);
+    color: #333;
+}
+
+/* Category Buttons */
+.btn-outline-light {
+    background-color: rgba(255, 255, 255, 0.15);
+    color: #fff;
+    font-weight: bold;
+}
+.btn-outline-light:hover {
+    background-color: rgba(255, 255, 255, 0.25);
+    color: #fff;
+}
+
+/* Alerts */
+.alert-warning {
+    background-color: rgba(255, 193, 7, 0.8);
+    color: #333;
+    font-weight: bold;
+}
+
+/* Progress bar color */
+.progress-bar.bg-danger {
+    background-color: #ff4d4d !important;
+}
+
+/* Responsive tweaks */
+@media (max-width: 768px) {
+    .d-flex.justify-content-around > div {
+        margin-bottom: 1rem;
+    }
+    .btn {
+        font-size: 0.9rem;
+    }
+    .modal-dialog {
+        max-width: 90%;
+    }
+}
