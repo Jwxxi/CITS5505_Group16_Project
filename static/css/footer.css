@@ -1,0 +1,22 @@
+.footer {
+  background-color: #ffffff;
+  padding: 20px 0;
+  margin-top: auto;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+}
+.footer p {
+  margin-bottom: 0;
+  color: #777;
+}
+.footer a {
+  color: #ffc107;
+}
+@media (max-width: 768px) {
+  .footer {
+    text-align: center;
+  }
+  .footer .text-md-end {
+    text-align: center !important;
+    margin-top: 10px;
+  }
+}
