@@ -1,4 +1,8 @@
 document.addEventListener("DOMContentLoaded", () => {
+  const today = new Date();
+  const currentMonth = today.toISOString().slice(0, 7); // Returns "YYYY-MM"
+  document.getElementById("monthFilter").value = currentMonth;
+
   // Fetch transactions from the backend
   async function fetchTransactions() {
     try {

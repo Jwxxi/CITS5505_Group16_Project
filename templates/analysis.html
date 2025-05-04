@@ -41,3 +41,7 @@
     <div id="rankingList" class="ranking-list"></div>
 </div>
 {% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/analysis.js') }}"></script>
+{% endblock %}
