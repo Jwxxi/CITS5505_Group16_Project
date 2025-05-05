@@ -1,7 +1,10 @@
 document.addEventListener("DOMContentLoaded", () => {
+  // month filter
   const today = new Date();
+  const monthFilter = document.getElementById("monthFilter");
   const currentMonth = today.toISOString().slice(0, 7); // Returns "YYYY-MM"
-  document.getElementById("monthFilter").value = currentMonth;
+  monthFilter.value = currentMonth;
+  monthFilter.max = currentMonth; // Prevent future months
 
   // Fetch transactions from the backend
   async function fetchTransactions() {
