@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %}My Transactions - Expense Tracker{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <input type="month" id="monthFilter" class="form-control w-auto" />
+    <button class="btn btn-primary" id="addTransaction" data-bs-toggle="modal" data-bs-target="#addTransactionModal">
+        <i class="fas fa-plus me-2"></i>Add
+    </button>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6 mb-3">
+        <div class="stats-card bg-success bg-opacity-10">
+            <h6>Total Income</h6>
+            <h3 id="totalIncome" class="text-success">$0.00</h3>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="stats-card bg-danger bg-opacity-10">
+            <h6>Total Expense</h6>
+            <h3 id="totalExpense" class="text-danger">$0.00</h3>
+        </div>
+    </div>
+</div>
+
+<div id="transactionsContainer"></div>
+
+<!-- Include the Add Transaction Modal -->
+{% include 'components/add_transaction_modal.html' %}
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/transactions.js') }}"></script>
+{% endblock %}

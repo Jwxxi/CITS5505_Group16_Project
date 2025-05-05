@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}Analysis - Expense Tracker{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex gap-3">
+        <select class="form-select" id="analysisType" style="width: 150px;">
+            <option value="expense">Expense</option>
+            <option value="income">Income</option>
+        </select>
+        <ul class="nav nav-pills">
+            <li class="nav-item">
+                <a class="nav-link active" href="#" data-period="month">By Month</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" data-period="year">By Year</a>
+            </li>
+        </ul>
+    </div>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#reportModal">Generate Report</button>
+</div>
+
+<div class="row mb-4 chart-container">
+    <div class="col-md-6">
+        <div class="chart-card">
+            <h5>Trend Overview</h5>
+            <canvas id="lineChart"></canvas>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="chart-card">
+            <h5>Category Distribution</h5>
+            <canvas id="pieChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<div class="ranking-card">
+    <h5 class="mb-3">Category Ranking</h5>
+    <div id="rankingList" class="ranking-list"></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/analysis.js') }}"></script>
+{% endblock %}
