@@ -2,50 +2,55 @@ document.addEventListener("DOMContentLoaded", function () {
   // Form elements
   const signupForm = document.getElementById("signupForm");
   const signInLink = document.getElementById("signInLink");
+  const errorElement = document.getElementById("error-message");
+  const successElement = document.getElementById("success-message");
 
   /**
-   * Form validation
+   * Form validation and submission
    */
   if (signupForm) {
     signupForm.addEventListener("submit", function (event) {
-      if (!this.checkValidity()) {
-        event.preventDefault();
-        event.stopPropagation();
-      } else {
-        event.preventDefault();
+      event.preventDefault();
 
-        // Get form data
-        const formData = new FormData(this);
-        const userData = {
-          name: formData.get("name"),
-          email: formData.get("email"),
-          password: formData.get("password"),
-        };
+      // Clear previous messages
+      errorElement.style.display = "none";
+      successElement.style.display = "none";
 
-        // Log the data
-        console.log("User registration data:", userData);
+      // Get form data
+      const formData = new FormData(this);
 
-        // Show success message
-        alert("Registration successful! You can now sign in.");
+      // Send data to server
+      fetch("/sign-up", {
+        method: "POST",
+        body: formData,
+      })
+        .then((response) => {
+          if (!response.ok) {
+            return response.json().then((data) => {
+              throw new Error(data.error);
+            });
+          }
+          return response.json();
+        })
+        .then((data) => {
+          // Show success message
+          successElement.textContent = data.success;
+          successElement.style.display = "block";
 
-        // Reset the form
-        this.reset();
-      }
-
-      this.classList.add("was-validated");
+          // Redirect to Sign-In page after 3 seconds
+          setTimeout(() => {
+            window.location.href = "/sign-in";
+          }, 3000);
+        })
+        .catch((error) => {
+          // Show error message
+          errorElement.textContent = error.message;
+          errorElement.style.display = "block";
+        });
     });
   }
 
-  /**
-   * Handle sign in link click
-   */
-  if (signInLink) {
-    signInLink.addEventListener("click", function (e) {
-      e.preventDefault();
-      // navigate to the sign-in page
-      alert("This would navigate to the Sign In page");
-    });
-  }
+  
 
   /**
    * Add animation effects
@@ -103,13 +108,5 @@ document.addEventListener("DOMContentLoaded", function () {
         }
       `;
     document.head.appendChild(styleSheet);
-  }
-  // add password strength validation
-  const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
-  if (!passwordRegex.test(userData.password)) {
-    alert(
-      "Password must contain at least 8 characters with letters and numbers"
-    );
-    return;
   }
 });
