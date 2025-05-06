@@ -1,19 +1,34 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // month filter
-  const today = new Date();
   const monthFilter = document.getElementById("monthFilter");
-  const currentMonth = today.toISOString().slice(0, 7); // Returns "YYYY-MM"
+  const today = new Date();
+  const currentMonth = today.toISOString().slice(0, 7); // Format: YYYY-MM
   monthFilter.value = currentMonth;
   monthFilter.max = currentMonth; // Prevent future months
 
   let currentPage = 1;
   let isLoading = false;
+  let transactionToDelete = null;
+  const deleteModal = new bootstrap.Modal(
+    document.getElementById("deleteConfirmationModal")
+  );
 
-  // Fetch transactions from the backend
-  async function fetchTransactions(page = 1) {
+  // Fetch transactions for the default month on page load
+  fetchTransactions(1, currentMonth);
+
+  monthFilter.addEventListener("change", () => {
+    const selectedMonth = monthFilter.value; // Format: YYYY-MM
+    fetchTransactions(1, selectedMonth); // Fetch transactions for the selected month
+  });
+
+  async function fetchTransactions(page = 1, month = null) {
     try {
       isLoading = true;
-      const response = await fetch(`/api/transactions?page=${page}&limit=20`);
+      let url = `/api/transactions?page=${page}&limit=20`;
+      if (month) {
+        url += `&month=${month}`;
+      }
+
+      const response = await fetch(url);
       if (response.ok) {
         const transactions = await response.json();
         renderTransactions(transactions);
@@ -26,12 +41,35 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Render transaction list
   function renderTransactions(transactions) {
     const container = document.getElementById("transactionsContainer");
     container.innerHTML = "";
 
-    // Group by date
+    if (transactions.length === 0) {
+      container.innerHTML =
+        "<p>No transactions found for the selected month.</p>";
+      document.getElementById("totalIncome").textContent = "$0.00";
+      document.getElementById("totalExpense").textContent = "$0.00";
+      return;
+    }
+
+    // Calculate totals
+    const totalIncome = transactions
+      .filter((t) => t.type === "income")
+      .reduce((sum, t) => sum + parseFloat(t.amount || 0), 0);
+
+    const totalExpense = transactions
+      .filter((t) => t.type === "expense")
+      .reduce((sum, t) => sum + parseFloat(t.amount || 0), 0);
+
+    document.getElementById(
+      "totalIncome"
+    ).textContent = `$${totalIncome.toFixed(2)}`;
+    document.getElementById(
+      "totalExpense"
+    ).textContent = `$${totalExpense.toFixed(2)}`;
+
+    // Group transactions by date
     const grouped = transactions.reduce((groups, t) => {
       const date = new Date(t.date).toDateString();
       if (!groups[date]) groups[date] = [];
@@ -56,20 +94,24 @@ document.addEventListener("DOMContentLoaded", () => {
         const item = document.createElement("div");
         item.className = "transaction-item";
         item.innerHTML = `
-  <div>
-    <i class="${t.icon} category-icon"></i>
-    ${t.category}
-  </div>
-  <div>${t.description}</div>
-  <div class="${
-    t.type === "income" ? "amount-income" : "amount-expense"
-  }">
-    ${t.type === "income" ? "+" : "-"}$${t.amount.toFixed(2)}
-  </div>
-  <div>
-    <i class="fas fa-trash delete-icon" data-id="${t.id}" title="Delete"></i>
-  </div>
-`;
+          <div>
+            <i class="${t.icon} category-icon"></i>
+            ${t.category}
+          </div>
+          <div>${t.description}</div>
+          <div class="${
+            t.type === "income" ? "amount-income" : "amount-expense"
+          }">
+            ${t.type === "income" ? "+" : "-"}$${parseFloat(t.amount).toFixed(
+          2
+        )}
+          </div>
+          <div>
+            <i class="fas fa-trash delete-icon" data-id="${
+              t.id
+            }" title="Delete"></i>
+          </div>
+        `;
         list.appendChild(item);
       });
 
@@ -78,56 +120,36 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // Attach delete event listeners
-    let transactionToDelete = null;
-
     document.querySelectorAll(".delete-icon").forEach((icon) => {
       icon.addEventListener("click", (e) => {
         transactionToDelete = e.target.dataset.id;
-        const deleteModal = new bootstrap.Modal(
-          document.getElementById("deleteConfirmationModal")
-        );
         deleteModal.show();
       });
     });
-
-    // Handle delete confirmation
-    document
-      .getElementById("confirmDeleteButton")
-      .addEventListener("click", async () => {
-        if (transactionToDelete) {
-          try {
-            const response = await fetch(
-              `/api/transactions/${transactionToDelete}`,
-              {
-                method: "DELETE",
-              }
-            );
-            if (response.ok) {
-              fetchTransactions(); // Refresh the transaction list
-            } else {
-              console.error("Failed to delete transaction");
-            }
-          } catch (error) {
-            console.error("Error deleting transaction:", error);
-          }
-        }
-      });
-
-    // Calculate and display total income and expense
-    const totalIncome = transactions
-      .filter((t) => t.type === "income")
-      .reduce((sum, t) => sum + t.amount, 0);
-    const totalExpense = transactions
-      .filter((t) => t.type === "expense")
-      .reduce((sum, t) => sum + t.amount, 0);
-
-    document.getElementById(
-      "totalIncome"
-    ).textContent = `$${totalIncome.toFixed(2)}`;
-    document.getElementById(
-      "totalExpense"
-    ).textContent = `$${totalExpense.toFixed(2)}`;
   }
+
+  document
+    .getElementById("confirmDeleteButton")
+    .addEventListener("click", async () => {
+      if (transactionToDelete) {
+        try {
+          const response = await fetch(
+            `/api/transactions/${transactionToDelete}`,
+            {
+              method: "DELETE",
+            }
+          );
+          if (response.ok) {
+            deleteModal.hide(); // Close the modal
+            fetchTransactions(1, monthFilter.value); // Refresh the transaction list
+          } else {
+            console.error("Failed to delete transaction");
+          }
+        } catch (error) {
+          console.error("Error deleting transaction:", error);
+        }
+      }
+    });
 
   // Disable form submission, only close the modal
   document
@@ -135,11 +157,6 @@ document.addEventListener("DOMContentLoaded", () => {
     .addEventListener("submit", async (e) => {
       e.preventDefault();
       const formData = new FormData(e.target);
-
-      // Debugging: Log the form data
-      for (let [key, value] of formData.entries()) {
-        console.log(`${key}: ${value}`);
-      }
 
       try {
         const response = await fetch("/api/transactions", {
@@ -151,7 +168,7 @@ document.addEventListener("DOMContentLoaded", () => {
             document.getElementById("addTransactionModal")
           );
           modal.hide();
-          fetchTransactions(); // Refresh the transaction list
+          fetchTransactions(1, monthFilter.value); // Refresh the transaction list
         } else {
           const errorData = await response.json();
           console.error("Failed to add transaction:", errorData.error);
@@ -167,7 +184,7 @@ document.addEventListener("DOMContentLoaded", () => {
       !isLoading
     ) {
       currentPage++;
-      fetchTransactions(currentPage);
+      fetchTransactions(currentPage, monthFilter.value);
     }
   });
 
@@ -212,7 +229,4 @@ document.addEventListener("DOMContentLoaded", () => {
   addTransactionModal.addEventListener("show.bs.modal", () => {
     transactionDate.value = todayDate;
   });
-
-  // Initial fetch
-  fetchTransactions();
 });

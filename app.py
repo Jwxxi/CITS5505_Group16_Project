@@ -146,6 +146,7 @@ def get_transactions():
     limit = request.args.get("limit", 20, type=int)
     month = request.args.get("month")  # Optional query parameter
 
+  
     query = Item.query.filter_by(user_id=current_user.id)
 
     if month:
@@ -154,12 +155,14 @@ def get_transactions():
         query = query.filter(Item.created_at.between(start_date, end_date))
 
     transactions = query.paginate(page=page, per_page=limit, error_out=False).items
+   
+
     return jsonify(
         [
             {
                 "id": t.id,
                 "category": t.category.name,
-                "icon": t.category.icon,  # Use the correct attribute
+                "icon": t.category.icon,
                 "description": t.description,
                 "amount": t.amount,
                 "date": t.created_at.strftime("%Y-%m-%d"),
