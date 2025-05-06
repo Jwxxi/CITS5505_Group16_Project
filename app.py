@@ -5,9 +5,9 @@ from flask_migrate import Migrate
 from sqlalchemy.exc import SQLAlchemyError
 from flask_login import LoginManager
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import login_user, logout_user, login_required
+from flask_login import login_user, logout_user, login_required, current_user
 import re
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)  # Generate a random secret key
@@ -28,7 +28,7 @@ login_manager.login_view = "signin"  # Redirect to sign-in page if not logged in
 
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(int(user_id))
+    return db.session.get(User, int(user_id))  # Use Session.get() instead of Query.get()
 
 
 @login_manager.unauthorized_handler
@@ -139,7 +139,115 @@ def logout():
     return redirect(url_for("signin"))
 
 
-# Add api endpoints below
+@app.route("/api/transactions", methods=["GET"])
+@login_required
+def get_transactions():
+    page = request.args.get("page", 1, type=int)
+    limit = request.args.get("limit", 20, type=int)
+    month = request.args.get("month")  # Optional query parameter
+
+    query = Item.query.filter_by(user_id=current_user.id)
+
+    if month:
+        start_date = f"{month}-01"
+        end_date = f"{month}-31"
+        query = query.filter(Item.created_at.between(start_date, end_date))
+
+    transactions = query.paginate(page=page, per_page=limit, error_out=False).items
+    return jsonify(
+        [
+            {
+                "id": t.id,
+                "category": t.category.name,
+                "icon": t.category.icon,  # Use the correct attribute
+                "description": t.description,
+                "amount": t.amount,
+                "date": t.created_at.strftime("%Y-%m-%d"),
+                "type": t.category.type,
+            }
+            for t in transactions
+        ]
+    )
+
+
+@app.route("/api/transactions", methods=["POST"])
+@login_required
+def add_transaction():
+    try:
+        # Log the incoming form data for debugging
+        print("Form Data:", request.form)
+
+        category_id = request.form.get("category_id")
+        description = request.form.get("description")
+        amount = request.form.get("amount")
+        date = request.form.get("date")
+
+        # Log each field to verify the data
+        print("Category ID:", category_id)
+        print("Description:", description)
+        print("Amount:", amount)
+        print("Date:", date)
+
+        # Validate input
+        if not category_id or not description or not amount or not date:
+            return jsonify({"error": "All fields are required"}), 400
+
+        try:
+            amount = float(amount)
+        except ValueError:
+            return jsonify({"error": "Invalid amount"}), 400
+
+        # Convert the date string to a datetime object
+        try:
+            parsed_date = datetime.strptime(date, "%Y-%m-%d")
+        except ValueError:
+            return jsonify({"error": "Invalid date format. Expected YYYY-MM-DD."}), 400
+
+        # Validate that the category exists
+        category = Category.query.filter_by(id=category_id).first()
+        if not category:
+            return jsonify({"error": "Invalid category"}), 400
+
+        new_transaction = Item(
+            user_id=current_user.id,
+            category_id=category_id,
+            description=description,
+            amount=amount,
+            created_at=parsed_date,  # Pass the datetime object here
+        )
+        db.session.add(new_transaction)
+        db.session.commit()
+        return jsonify({"success": "Transaction added successfully"}), 201
+    except Exception as e:
+        print("Error:", str(e))  # Log the error for debugging
+        return jsonify({"error": "Failed to add transaction"}), 400
+
+
+@app.route("/api/transactions/<int:transaction_id>", methods=["DELETE"])
+@login_required
+def delete_transaction(transaction_id):
+    transaction = Item.query.filter_by(
+        id=transaction_id, user_id=current_user.id
+    ).first()
+    if not transaction:
+        return jsonify({"error": "Transaction not found"}), 404
+
+    db.session.delete(transaction)
+    db.session.commit()
+    return jsonify({"success": "Transaction deleted successfully"}), 200
+
+
+@app.route("/api/categories", methods=["GET"])
+@login_required
+def get_categories():
+    category_type = request.args.get("type")  # 'income' or 'expense'
+    if category_type not in ["income", "expense"]:
+        return jsonify({"error": "Invalid category type"}), 400
+
+    categories = Category.query.filter_by(type=category_type).all()
+    return jsonify(
+        [{"id": c.id, "name": c.name, "icon": c.icon} for c in categories]
+    )
 
 
 if __name__ == "__main__":

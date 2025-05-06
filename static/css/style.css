@@ -209,6 +209,12 @@ body {
   flex-basis: 50%;
   color: #6c757d;
 }
+.category-icon {
+  width: 24px;
+  height: 24px;
+  margin-right: 8px;
+  vertical-align: middle;
+}
 .amount-income {
   color: #28a745;
   font-weight: 500;
