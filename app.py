@@ -174,19 +174,14 @@ def get_transactions():
 @login_required
 def add_transaction():
     try:
-        # Log the incoming form data for debugging
-        print("Form Data:", request.form)
+        
 
         category_id = request.form.get("category_id")
         description = request.form.get("description")
         amount = request.form.get("amount")
         date = request.form.get("date")
 
-        # Log each field to verify the data
-        print("Category ID:", category_id)
-        print("Description:", description)
-        print("Amount:", amount)
-        print("Date:", date)
+       
 
         # Validate input
         if not category_id or not description or not amount or not date:
@@ -219,7 +214,7 @@ def add_transaction():
         db.session.commit()
         return jsonify({"success": "Transaction added successfully"}), 201
     except Exception as e:
-        print("Error:", str(e))  # Log the error for debugging
+     
         return jsonify({"error": "Failed to add transaction"}), 400
 
 
