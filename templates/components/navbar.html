@@ -1,32 +1,42 @@
 <nav class="navbar navbar-expand-lg">
     <div class="container">
-        <a class="navbar-brand">
-            <i class="fas fa-wallet me-2"></i>
-            Expense Tracker
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto">
-                {% if request.endpoint in ['signin', 'signup','home'] %}
-                <!-- Navbar for Sign-In/Sign-Up Pages -->
-                
-                {% else %}
-                <!-- Navbar for Authenticated Pages -->
-                <li class="nav-item">
-                    <a class="nav-link {% if request.endpoint == 'transactions' %}active{% endif %}" href="{{ url_for('transactions') }}">My Transactions</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {% if request.endpoint == 'analysis' %}active{% endif %}" href="{{ url_for('analysis') }}">My Analysis</a>
-                </li>
-                <li class="nav-item">
-                    <span class="navbar-text ms-3">
-                        <i class="fas fa-user me-2"></i>Welcome, John Doe
-                    </span>
-                </li>
-                {% endif %}
-            </ul>
-        </div>
+      <a class="navbar-brand">
+        <i class="fas fa-wallet me-2"></i>
+        Expense Tracker
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+  
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          {% if current_user.is_authenticated %}
+            <li class="nav-item">
+              <a class="nav-link {% if request.endpoint == 'transactions' %}active{% endif %}" href="{{ url_for('transactions') }}">My Transactions</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link {% if request.endpoint == 'analysis' %}active{% endif %}" href="{{ url_for('analysis') }}">My Analysis</a>
+            </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-user me-2"></i>Welcome, {{ current_user.name }}
+              </a>
+              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                <li><a class="dropdown-item" href="{{ url_for('edit_profile') }}">Edit Profile</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('logout') }}">Logout</a></li>
+              </ul>
+            </li>
+          {% else %}
+            <!-- Navbar for unauthenticated users -->
+            <li class="nav-item">
+              <a class="nav-link {% if request.endpoint == 'signin' %}active{% endif %}" href="{{ url_for('signin') }}">Sign In</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link {% if request.endpoint == 'signup' %}active{% endif %}" href="{{ url_for('signup') }}">Sign Up</a>
+            </li>
+          {% endif %}
+        </ul>
+      </div>
     </div>
-</nav>
+  </nav>
+  
