@@ -6,8 +6,8 @@ __pycache__/
 *.pyc
  
 # Database file
-app.db
 *.db-journal
+instance/*.db
  
 #Metadata
 .DS_Store
