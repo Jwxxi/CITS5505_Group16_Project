@@ -68,16 +68,20 @@ body {
 /*=====================
   =  Form / Card Styles =
   =====================*/
-.form-card {
-  background-color: #ffffff;
-  border-radius: 15px;
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  max-width: 450px;
-  padding: 30px;
+.container {
+  max-width: 1200px;
   margin: 0 auto;
-  border: 1px solid rgba(0, 0, 0, 0.05);
 }
+
+.form-card {
+  background: #fff;
+  border-radius: 15px;
+  padding: 30px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  margin-bottom: 24px;
+  width: 100%;
+}
+
 .inner-card {
   background-color: #f9f9f9;
   border-radius: 12px;
@@ -95,13 +99,10 @@ body {
   =  Form Input Fields =
   ====================*/
 .custom-input {
-  border: none;
-  border-bottom: 2px solid rgba(255, 193, 7, 0.5);
-  padding: 12px 5px;
-  margin-bottom: 20px;
-  background-color: transparent;
-  color: #333;
-  transition: all 0.3s ease;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 1rem;
 }
 .custom-input:focus {
   box-shadow: none;
@@ -130,6 +131,7 @@ body {
   letter-spacing: 1px;
   transition: all 0.3s ease;
   box-shadow: 0 5px 15px rgba(255, 193, 7, 0.3);
+  min-width: 80px;
 }
 .signup-btn:hover {
   background: linear-gradient(45deg, #ff9800, #ffc107);
@@ -150,6 +152,16 @@ body {
 .sign-in-link a:hover {
   color: #ff9800;
   text-decoration: underline;
+}
+
+.btn-outline-secondary {
+  min-width: 90px;
+}
+.gap-2 > * {
+  margin-right: 8px;
+}
+.gap-2 > *:last-child {
+  margin-right: 0;
 }
 
 /*===============
@@ -293,4 +305,42 @@ body {
 .ranking-card {
   margin-top: 2rem;
   min-height: 300px;
+}
+.custom-table {
+  width: 100%;
+  border-radius: 15px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  background: #fff;
+  margin-bottom: 24px;
+}
+.custom-table th,
+.custom-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #f0f0f0;
+  color: #333;
+}
+.custom-table thead tr {
+  background: #fff8e1;
+  color: #333;
+  border-bottom: 2px solid #ffc107;
+}
+.custom-table tbody tr:hover {
+  background: #fffbe6;
+}
+.custom-table tbody td,
+.custom-table tbody th {
+  color: #333 !important;
+}
+
+.summary-card {
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.text-center {
+  text-align: center;
 }
