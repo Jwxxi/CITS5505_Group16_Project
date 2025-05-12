@@ -1,0 +1,15 @@
+# Virtual Environment
+venv/
+ 
+# Python cache files
+__pycache__/
+*.pyc
+ 
+# Database file
+app.db
+*.db-journal
+ 
+#Metadata
+.DS_Store
+templates/.DS_Store
+ 
