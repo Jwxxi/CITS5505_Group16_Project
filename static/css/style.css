@@ -1,94 +1,126 @@
-/* ===============================
-   Global Layout & Background
-================================== */
+/* style.css – merged CSS for all pages */
+
+/*===========================
+=  Global & Layout Styles  =
+===========================*/
 body {
-  margin: 0;
-  padding: 0;
-  background: url('../images/bg.png') no-repeat center center fixed;
-  background-size: cover;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f5f2ed;
+  font-family: "Arial", sans-serif;
+  color: #333;
   min-height: 100vh;
-  color: #ffffff;
   display: flex;
   flex-direction: column;
+  position: relative;
+  overflow-x: hidden;
 }
 
-/* ===============================
-   Navbar
-================================== */
-.navbar {
-  background-color: rgba(0, 0, 0, 0.85) !important;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
+.bg-shapes {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  overflow: hidden;
 }
-.navbar-brand {
-  font-weight: bold;
-  color: #ffc107;
+.shape {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
 }
-.navbar-brand i {
-  color: #ffc107;
+.shape-1 {
+  width: 500px;
+  height: 500px;
+  background: rgba(255, 193, 7, 0.2);
+  top: -100px;
+  right: -100px;
 }
-.nav-link {
-  color: #eee !important;
-  font-weight: 500;
+.shape-2 {
+  width: 600px;
+  height: 600px;
+  background: rgba(13, 110, 253, 0.15);
+  bottom: -200px;
+  left: -200px;
 }
-.nav-link.active {
-  color: #ffc107 !important;
+.shape-3 {
+  width: 300px;
+  height: 300px;
+  background: rgba(220, 53, 69, 0.15);
+  top: 40%;
+  right: 30%;
+}
+.shape-4 {
+  width: 200px;
+  height: 200px;
+  background: rgba(25, 135, 84, 0.15);
+  top: 20%;
+  left: 20%;
 }
 
-/* ===============================
-   Form Cards (Sign In / Sign Up)
-================================== */
 .main-content {
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 40px 0;
+  position: relative;
+  z-index: 1;
 }
+
+/*=====================
+  =  Form / Card Styles =
+  =====================*/
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
 .form-card {
-  background-color: rgba(0, 0, 0, 0.85);
+  background: #fff;
   border-radius: 15px;
   padding: 30px;
-  max-width: 450px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  margin-bottom: 24px;
   width: 100%;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+  height: 100%;
 }
+
 .inner-card {
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: #f9f9f9;
   border-radius: 12px;
   padding: 30px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
 }
 .form-title {
   font-weight: 600;
   margin-bottom: 30px;
-  color: #ffc107;
+  color: #333;
   text-align: center;
 }
 
-/* ===============================
-   Input Fields
-================================== */
+/*====================
+  =  Form Input Fields =
+  ====================*/
 .custom-input {
-  background-color: rgba(255, 255, 255, 0.9);
-  color: #000;
-  border: none;
-  border-bottom: 2px solid rgba(255, 193, 7, 0.5);
-  padding: 12px 10px;
-  margin-bottom: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 1rem;
+}
+.custom-input:focus {
+  box-shadow: none;
+  border-color: #ffc107;
+  background-color: rgba(0, 0, 0, 0.02);
+}
+.input-focused {
+  transform: translateY(-5px);
   transition: all 0.3s ease;
 }
 .custom-input::placeholder {
-  color: #555;
-}
-.custom-input:focus {
-  border-color: #ffc107;
-  box-shadow: none;
-  background-color: #fff;
+  color: #aaa;
 }
 
-/* ===============================
-   Buttons
-================================== */
+/*===========
+  =  Buttons =
+  ===========*/
 .signup-btn {
   background: linear-gradient(45deg, #ffc107, #ff9800);
   border: none;
@@ -96,72 +128,231 @@ body {
   padding: 12px;
   font-weight: 600;
   width: 100%;
-  margin-top: 20px;
+  margin-top: 30px;
   letter-spacing: 1px;
-  color: white;
-  box-shadow: 0 5px 15px rgba(255, 193, 7, 0.3);
   transition: all 0.3s ease;
+  box-shadow: 0 5px 15px rgba(255, 193, 7, 0.3);
+  min-width: 80px;
 }
 .signup-btn:hover {
   background: linear-gradient(45deg, #ff9800, #ffc107);
   transform: translateY(-3px);
   box-shadow: 0 8px 20px rgba(255, 193, 7, 0.4);
 }
-
 .sign-in-link {
   text-align: center;
   margin-top: 25px;
-  color: #bbb;
+  color: #777;
 }
 .sign-in-link a {
   color: #ffc107;
   text-decoration: none;
   font-weight: 500;
+  transition: all 0.3s ease;
 }
 .sign-in-link a:hover {
   color: #ff9800;
   text-decoration: underline;
 }
 
-/* ===============================
-   Toasts
-================================== */
-.toast {
-  background-color: #4CAF50;
-  border-radius: 10px;
-  font-size: 0.9rem;
+.btn-outline-secondary {
+  min-width: 90px;
+}
+.gap-2 > * {
+  margin-right: 8px;
+}
+.gap-2 > *:last-child {
+  margin-right: 0;
 }
 
-/* ===============================
-   Footer
-================================== */
-.footer {
-  background-color: rgba(0, 0, 0, 0.85);
-  padding: 20px 0;
-  text-align: center;
-  color: #bbb;
-  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
-}
-
-
-.footer p {
-  margin-bottom: 0;
-}
-
-/* ===============================
-   Responsive Design
-================================== */
+/*===============
+  =  Responsive   =
+  ===============*/
 @media (max-width: 768px) {
   .form-card {
     margin: 20px;
   }
-  .footer .text-md-end {
-    text-align: center !important;
-    margin-top: 10px;
+  .shape {
+    display: none;
   }
 }
 
-table td {
-  color: white;
+@media (min-width: 768px) {
+  .form-card {
+    min-height: 400px;
+  }
 }
 
+/*====================
+  =  Validation States =
+  ====================*/
+.was-validated .form-control:valid {
+  border-color: #28a745;
+  background-image: none;
+}
+.was-validated .form-control:invalid {
+  border-color: #dc3545;
+  background-image: none;
+}
+
+/*========================
+  =  Transactions Page    =
+  ========================*/
+#transactionsContainer {
+  max-height: 500px;
+}
+.transaction-day-header {
+  background-color: #f8f9fa;
+  padding: 0.75rem 1rem;
+  margin: 1rem 0;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  color: #6c757d;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+.transaction-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  margin: 0.5rem 0;
+  background: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+.transaction-item > div:first-child {
+  flex-basis: 25%;
+  font-weight: 500;
+}
+.transaction-item > div:nth-child(2) {
+  flex-basis: 50%;
+  color: #6c757d;
+}
+.category-icon {
+  width: 24px;
+  height: 24px;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+.amount-income {
+  color: #28a745;
+  font-weight: 500;
+}
+.amount-expense {
+  color: #dc3545;
+  font-weight: 500;
+}
+
+/*=======================
+  =  Analytics / Charts  =
+  =======================*/
+.chart-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1.5rem;
+}
+.chart-card h5 {
+  color: #444;
+  margin-bottom: 1rem;
+}
+.ranking-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+.ranking-item {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem;
+  margin: 0.5rem 0;
+  background: #f8f9fa;
+  border-radius: 0.5rem;
+}
+.progress-bar {
+  height: 8px;
+  background: #007bff;
+  border-radius: 4px;
+  margin: 0 1rem;
+  flex-grow: 1;
+}
+.ranking-label {
+  width: 120px;
+  font-weight: 500;
+}
+.ranking-value {
+  width: 80px;
+  text-align: right;
+}
+.nav-pills .nav-link {
+  border-radius: 20px;
+  padding: 0.5rem 1.25rem;
+}
+.nav-pills .nav-link.active {
+  background: linear-gradient(45deg, #ffc107, #ff9800);
+  color: white !important;
+}
+
+/* Layout tweaks for charts */
+.chart-container {
+  min-height: 400px;
+}
+.chart-card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.chart-card canvas {
+  flex: 1;
+  min-height: 300px;
+  max-height: 400px;
+}
+.ranking-card {
+  margin-top: 2rem;
+  min-height: 300px;
+}
+.custom-table {
+  width: 100%;
+  border-radius: 15px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  background: #fff;
+  margin-bottom: 24px;
+}
+.custom-table th,
+.custom-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #f0f0f0;
+  color: #333;
+}
+.custom-table thead tr {
+  background: #fff8e1;
+  color: #333;
+  border-bottom: 2px solid #ffc107;
+}
+.custom-table tbody tr:hover {
+  background: #fffbe6;
+}
+.custom-table tbody td,
+.custom-table tbody th {
+  color: #333 !important;
+}
+
+.summary-card {
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.row {
+  margin-left: 0;
+  margin-right: 0;
+}
