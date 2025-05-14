@@ -1,7 +1,14 @@
 # Updated app.py with profile edit routing, flash messages, and dropdown support
 
 from flask import Flask, render_template, request, redirect, url_for, jsonify, flash
-from flask_login import LoginManager, login_user, login_required, logout_user, current_user, UserMixin
+from flask_login import (
+    LoginManager,
+    login_user,
+    login_required,
+    logout_user,
+    current_user,
+    UserMixin,
+)
 from flask_migrate import Migrate
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.exc import SQLAlchemyError
@@ -11,11 +18,11 @@ import os
 import csv
 from io import StringIO
 from flask import Response
+
 # Backend functionality for CSV Export and Import
 from flask import send_file
 import csv
 from io import StringIO
-
 
 
 app = Flask(__name__)
@@ -34,12 +41,14 @@ with app.app_context():
     db.create_all()
     preload_categories()
 
+
 # =====================
 # User Loader
 # =====================
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
+
 
 # =====================
 # Error Handlers
@@ -48,9 +57,11 @@ def load_user(user_id):
 def handle_db_error(e):
     return jsonify({"error": "A database error occurred"}), 500
 
+
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template("404.html"), 404
+
 
 # =====================
 # Routes
@@ -58,6 +69,7 @@ def page_not_found(e):
 @app.route("/")
 def home():
     return render_template("sign-up.html")
+
 
 @app.route("/sign-in", methods=["GET", "POST"])
 def signin():
@@ -69,8 +81,11 @@ def signin():
             login_user(user)
             return redirect(url_for("transactions"))
         else:
-            return render_template("sign-in.html", error="Invalid credentials")
+            return render_template(
+                "sign-in.html", error="Incorrect email or password. Please try again."
+            )
     return render_template("sign-in.html")
+
 
 @app.route("/sign-up", methods=["GET", "POST"])
 def signup():
@@ -83,11 +98,19 @@ def signup():
         if existing_user:
             return render_template("sign-up.html", error="Email already registered")
 
-        new_user = User(name=name, email=email, password=generate_password_hash(password))
+        new_user = User(
+            name=name, email=email, password=generate_password_hash(password)
+        )
         db.session.add(new_user)
         db.session.commit()
-        return redirect(url_for("signin"))
+        # Show success message on sign-up page, then auto-redirect
+        return render_template(
+            "sign-up.html",
+            success="Sign up successful! Redirecting to sign in...",
+            redirect_to_signin=True,
+        )
     return render_template("sign-up.html")
+
 
 @app.route("/logout")
 @login_required
@@ -95,16 +118,21 @@ def logout():
     logout_user()
     return redirect(url_for("signin"))
 
+
 @app.route("/transactions")
 @login_required
 def transactions():
     categories = Category.query.all()
-    return render_template("transactions.html", user=current_user, categories=categories)
+    return render_template(
+        "transactions.html", user=current_user, categories=categories
+    )
+
 
 @app.route("/analysis")
 @login_required
 def analysis():
     return render_template("analysis.html", user=current_user)
+
 
 @app.route("/profile", methods=["GET", "POST"])
 @login_required
@@ -137,16 +165,19 @@ def get_transactions():
     items = Item.query.filter_by(user_id=current_user.id).all()
     transactions = []
     for item in items:
-        transactions.append({
-            "id": item.id,
-            "category": item.category.name,
-            "category_id": item.category.id,
-            "type": item.category.type,
-            "amount": item.amount,
-            "description": item.description,
-            "date": item.created_at.strftime("%Y-%m-%d")
-        })
+        transactions.append(
+            {
+                "id": item.id,
+                "category": item.category.name,
+                "category_id": item.category.id,
+                "type": item.category.type,
+                "amount": item.amount,
+                "description": item.description,
+                "date": item.created_at.strftime("%Y-%m-%d"),
+            }
+        )
     return jsonify(transactions)
+
 
 @app.route("/api/transactions", methods=["POST"])
 @login_required
@@ -159,7 +190,9 @@ def add_transaction():
 
     try:
         date_str = data.get("date")
-        created_at = datetime.strptime(date_str, "%Y-%m-%d") if date_str else datetime.utcnow()
+        created_at = (
+            datetime.strptime(date_str, "%Y-%m-%d") if date_str else datetime.utcnow()
+        )
     except ValueError:
         return jsonify({"error": "Invalid date format"}), 400
 
@@ -168,11 +201,12 @@ def add_transaction():
         category_id=category.id,
         description=data.get("description"),
         amount=data.get("amount"),
-        created_at=created_at
+        created_at=created_at,
     )
     db.session.add(item)
     db.session.commit()
     return jsonify({"message": "Transaction added"}), 201
+
 
 @app.route("/api/transactions/<int:transaction_id>", methods=["PUT"])
 @login_required
@@ -199,6 +233,7 @@ def update_transaction(transaction_id):
     db.session.commit()
     return jsonify({"message": "Transaction updated"})
 
+
 @app.route("/api/transactions/<int:transaction_id>", methods=["DELETE"])
 @login_required
 def delete_transaction(transaction_id):
@@ -210,16 +245,21 @@ def delete_transaction(transaction_id):
     db.session.commit()
     return jsonify({"message": "Transaction deleted"})
 
+
 @app.route("/api/categories")
 @login_required
 def get_categories():
     categories = Category.query.all()
-    return jsonify([
-        {"id": c.id, "name": c.name, "type": c.type, "icon": c.icon}
-        for c in categories
-    ])
+    return jsonify(
+        [
+            {"id": c.id, "name": c.name, "type": c.type, "icon": c.icon}
+            for c in categories
+        ]
+    )
+
 
 from sqlalchemy import extract, func
+
 
 # =====================
 # API: Analysis - Category Breakdown
@@ -238,6 +278,7 @@ def get_analysis_by_type():
     data = {name: float(total) for name, total in results}
     return jsonify({"categories": data})
 
+
 # =====================
 # API: Analysis - Monthly Income vs Expense
 # =====================
@@ -248,7 +289,7 @@ def get_monthly_income_expense():
         db.session.query(
             extract("month", Item.created_at).label("month"),
             Category.type,
-            func.sum(Item.amount)
+            func.sum(Item.amount),
         )
         .join(Item.category)
         .filter(Item.user_id == current_user.id)
@@ -257,17 +298,13 @@ def get_monthly_income_expense():
         .all()
     )
 
-    breakdown = {
-        month: {"income": 0, "expense": 0}
-        for month in range(1, 13)
-    }
+    breakdown = {month: {"income": 0, "expense": 0} for month in range(1, 13)}
 
     for month, ttype, total in results:
         if ttype in breakdown[month]:
             breakdown[month][ttype] = float(total)
 
     return jsonify(breakdown)
-
 
 
 # ==============================
@@ -283,21 +320,24 @@ def export_transactions():
     cw.writerow(["Date", "Category", "Type", "Description", "Amount"])
 
     for item in items:
-        cw.writerow([
-            item.created_at.strftime("%Y-%m-%d"),
-            item.category.name,
-            item.category.type,
-            item.description,
-            item.amount
-        ])
+        cw.writerow(
+            [
+                item.created_at.strftime("%Y-%m-%d"),
+                item.category.name,
+                item.category.type,
+                item.description,
+                item.amount,
+            ]
+        )
 
     si.seek(0)
     return send_file(
         StringIO(si.read()),
         mimetype="text/csv",
         as_attachment=True,
-        download_name="transactions.csv"
+        download_name="transactions.csv",
     )
+
 
 # ==============================
 # Import Transactions from CSV
@@ -314,7 +354,9 @@ def import_transactions():
         reader = csv.DictReader(stream)
 
         for row in reader:
-            category = Category.query.filter_by(name=row["Category"], type=row["Type"]).first()
+            category = Category.query.filter_by(
+                name=row["Category"], type=row["Type"]
+            ).first()
             if not category:
                 continue  # Skip invalid categories
 
@@ -323,7 +365,7 @@ def import_transactions():
                 category_id=category.id,
                 description=row["Description"],
                 amount=float(row["Amount"]),
-                created_at=datetime.strptime(row["Date"], "%Y-%m-%d")
+                created_at=datetime.strptime(row["Date"], "%Y-%m-%d"),
             )
             db.session.add(item)
         db.session.commit()
