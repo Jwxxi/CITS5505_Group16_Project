@@ -128,6 +128,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+<<<<<<< HEAD
   document
     .getElementById("confirmDeleteButton")
     .addEventListener("click", async () => {
@@ -229,4 +230,173 @@ document.addEventListener("DOMContentLoaded", () => {
   addTransactionModal.addEventListener("show.bs.modal", () => {
     transactionDate.value = todayDate;
   });
+=======
+  function renderTransactions(transactions) {
+    transactionsTableBody.innerHTML = "";
+    transactions.forEach((tx) => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td style="color:white;">${new Date(tx.date).toLocaleDateString()}</td>
+        <td style="color:white;">${tx.category || "-"}</td>
+        <td style="color:white;">${tx.description || "-"}</td>
+        <td style="color:white;" class="${tx.type === "income" ? "text-success" : "text-danger"}">
+          $${tx.amount ? tx.amount.toFixed(2) : "0.00"}
+        </td>
+        <td>
+          <button class="btn btn-sm btn-warning edit-btn" data-id="${tx.id}">Edit</button>
+          <button class="btn btn-sm btn-danger delete-btn" data-id="${tx.id}">Delete</button>
+        </td>
+      `;
+      transactionsTableBody.appendChild(row);
+    });
+  }
+
+  function applyFilters() {
+    let filtered = allTransactions;
+    const selectedYear = yearFilter.value;
+    const selectedMonth = monthFilter.value;
+    const searchTerm = searchInput.value.toLowerCase();
+
+    if (selectedYear) {
+      filtered = filtered.filter(tx => new Date(tx.date).getFullYear().toString() === selectedYear);
+    }
+
+    if (selectedMonth) {
+      filtered = filtered.filter(tx => (new Date(tx.date).getMonth() + 1).toString() === selectedMonth);
+    }
+
+    if (searchTerm) {
+      filtered = filtered.filter(tx => tx.description && tx.description.toLowerCase().includes(searchTerm));
+    }
+
+    renderTransactions(filtered);
+    updateTotals(filtered);
+  }
+
+  function updateTotals(transactions) {
+    const expenseTotal = transactions
+      .filter(tx => tx.type === "expense")
+      .reduce((sum, tx) => sum + tx.amount, 0);
+
+    const incomeTotal = transactions
+      .filter(tx => tx.type === "income")
+      .reduce((sum, tx) => sum + tx.amount, 0);
+
+    totalExpenseEl.textContent = `$${expenseTotal.toFixed(2)}`;
+    totalIncomeEl.textContent = `$${incomeTotal.toFixed(2)}`;
+  }
+
+  applyBtn.addEventListener("click", applyFilters);
+  showAllBtn.addEventListener("click", () => {
+    renderTransactions(allTransactions);
+    updateTotals(allTransactions);
+    yearFilter.value = "";
+    monthFilter.value = "";
+    searchInput.value = "";
+  });
+
+  transactionForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const formData = new FormData(transactionForm);
+    const id = formData.get("transaction_id");
+
+    const payload = {
+      description: formData.get("description"),
+      amount: parseFloat(formData.get("amount")),
+      category_id: parseInt(formData.get("category_id")),
+      date: formData.get("date"),
+    };
+
+    const method = id ? "PUT" : "POST";
+    const url = id ? `/api/transactions/${id}` : "/api/transactions";
+
+    try {
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error("Failed to save transaction");
+      bootstrap.Modal.getInstance(document.getElementById("addTransactionModal")).hide();
+      transactionForm.reset();
+      fetchTransactions();
+    } catch (err) {
+      console.error("Submit error:", err);
+    }
+  });
+
+  transactionsTableBody.addEventListener("click", async (e) => {
+    const id = e.target.dataset.id;
+
+    if (e.target.classList.contains("delete-btn")) {
+      if (confirm("Are you sure you want to delete this transaction?")) {
+        try {
+          await fetch(`/api/transactions/${id}`, { method: "DELETE" });
+          fetchTransactions();
+        } catch (err) {
+          console.error("Delete failed:", err);
+        }
+      }
+    }
+
+    if (e.target.classList.contains("edit-btn")) {
+      const tx = allTransactions.find(t => t.id == id);
+      if (!tx) return;
+
+      document.getElementById("transactionId").value = tx.id;
+      transactionForm.description.value = tx.description;
+      transactionForm.amount.value = tx.amount;
+      transactionForm.category_id.value = getCategoryIdByName(tx.category);
+      transactionForm.date.value = tx.date;
+
+      const modal = new bootstrap.Modal(document.getElementById("addTransactionModal"));
+      modal.show();
+    }
+  });
+
+  exportCsvBtn.addEventListener("click", () => {
+    const csvContent = [
+      ["Date", "Description", "Amount", "Category"],
+      ...allTransactions.map(tx => [
+        tx.date,
+        `"${tx.description}"`,
+        tx.amount,
+        tx.category
+      ])
+    ]
+      .map(e => e.join(","))
+      .join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "transactions.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  });
+
+  importCsvForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const formData = new FormData(importCsvForm);
+
+    try {
+      const res = await fetch("/import-csv", {
+        method: "POST",
+        body: formData,
+      });
+      if (!res.ok) throw new Error("Failed to import CSV");
+      bootstrap.Modal.getInstance(document.getElementById("importCsvModal")).hide();
+      importCsvForm.reset();
+      fetchTransactions();
+    } catch (err) {
+      console.error("Import CSV error:", err);
+      alert("Import failed.");
+    }
+  });
+
+  fetchCategories();
+  fetchTransactions();
+>>>>>>> main
 });

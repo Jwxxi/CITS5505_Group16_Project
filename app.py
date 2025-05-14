@@ -1,26 +1,57 @@
+<<<<<<< HEAD
 import os
 from flask import Flask, render_template, jsonify, request, redirect, url_for
 from model import db, preload_categories, Item, Category, User
+=======
+# Updated app.py with profile edit routing, flash messages, and dropdown support
+
+from flask import Flask, render_template, request, redirect, url_for, jsonify, flash
+from flask_login import LoginManager, login_user, login_required, logout_user, current_user, UserMixin
+>>>>>>> main
 from flask_migrate import Migrate
+from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.exc import SQLAlchemyError
+<<<<<<< HEAD
 from flask_login import LoginManager
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, logout_user, login_required, current_user
 import re
 from datetime import timedelta, datetime
+=======
+from model import db, preload_categories, User, Item, Category
+from datetime import datetime
+import os
+import csv
+from io import StringIO
+from flask import Response
+# Backend functionality for CSV Export and Import
+from flask import send_file
+import csv
+from io import StringIO
+
+
+>>>>>>> main
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)  # Generate a random secret key
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///expense-tracker.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+<<<<<<< HEAD
 app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes=30)
 app.config["SESSION_COOKIE_SECURE"] = True  # Use HTTPS
 app.config["SESSION_COOKIE_HTTPONLY"] = True  # Prevent JavaScript access
 app.config["SESSION_COOKIE_SAMESITE"] = "Lax"  # Prevent CSRF
+=======
+app.secret_key = os.urandom(24)
+>>>>>>> main
 
+# Initialize extensions
 db.init_app(app)
-migrate = Migrate(app, db)  # Initialize Flask-Migrate
+migrate = Migrate(app, db)
+login_manager = LoginManager(app)
+login_manager.login_view = "signin"
 
+<<<<<<< HEAD
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "signin"  # Redirect to sign-in page if not logged in
@@ -37,31 +68,48 @@ def unauthorized():
 
 
 # Initialize the database tables and preload categories
+=======
+# Create tables and preload categories
+>>>>>>> main
 with app.app_context():
     db.create_all()
     preload_categories()
 
+# =====================
+# User Loader
+# =====================
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
 
+# =====================
+# Error Handlers
+# =====================
 @app.errorhandler(SQLAlchemyError)
 def handle_db_error(e):
     return jsonify({"error": "A database error occurred"}), 500
-
 
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template("404.html"), 404
 
-
+# =====================
+# Routes
+# =====================
 @app.route("/")
 def home():
     return render_template("sign-up.html")
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> main
 @app.route("/sign-in", methods=["GET", "POST"])
 def signin():
     if request.method == "POST":
         email = request.form.get("email")
         password = request.form.get("password")
+<<<<<<< HEAD
         remember = request.form.get("remember") == "on"
 
         user = User.query.filter_by(email=email).first()
@@ -74,6 +122,16 @@ def signin():
     return render_template("sign-in.html")
 
 
+=======
+        user = User.query.filter_by(email=email).first()
+        if user and check_password_hash(user.password, password):
+            login_user(user)
+            return redirect(url_for("transactions"))
+        else:
+            return render_template("sign-in.html", error="Invalid credentials")
+    return render_template("sign-in.html")
+
+>>>>>>> main
 @app.route("/sign-up", methods=["GET", "POST"])
 def signup():
     if request.method == "POST":
@@ -81,6 +139,7 @@ def signup():
         email = request.form.get("email")
         password = request.form.get("password")
 
+<<<<<<< HEAD
         # Validate email format
         email_regex = r"^[\w\.-]+@[\w\.-]+\.\w+$"
         if not re.match(email_regex, email):
@@ -117,19 +176,55 @@ def signup():
             200,
         )
 
+=======
+        existing_user = User.query.filter_by(email=email).first()
+        if existing_user:
+            return render_template("sign-up.html", error="Email already registered")
+
+        new_user = User(name=name, email=email, password=generate_password_hash(password))
+        db.session.add(new_user)
+        db.session.commit()
+        return redirect(url_for("signin"))
+>>>>>>> main
     return render_template("sign-up.html")
 
+@app.route("/logout")
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for("signin"))
 
 @app.route("/transactions")
 @login_required
 def transactions():
-    return render_template("transactions.html")
-
+    categories = Category.query.all()
+    return render_template("transactions.html", user=current_user, categories=categories)
 
 @app.route("/analysis")
 @login_required
 def analysis():
-    return render_template("analysis.html")
+    return render_template("analysis.html", user=current_user)
+
+@app.route("/profile", methods=["GET", "POST"])
+@login_required
+def edit_profile():
+    if request.method == "POST":
+        name = request.form.get("name")
+        email = request.form.get("email")
+        password = request.form.get("password")
+
+        if email != current_user.email and User.query.filter_by(email=email).first():
+            flash("Email is already in use.", "danger")
+        else:
+            current_user.name = name
+            current_user.email = email
+            if password:
+                current_user.password = generate_password_hash(password)
+            db.session.commit()
+            flash("Profile updated successfully!", "success")
+            return redirect(url_for("edit_profile"))
+
+    return render_template("edit_profile.html", user=current_user)
 
 
 @app.route("/logout")

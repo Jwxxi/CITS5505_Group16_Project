@@ -1,3 +1,21 @@
+<<<<<<< HEAD
 venv/
 __pycache__/
 .gitignoregit
+=======
+# Virtual Environment
+venv/
+ 
+# Python cache files
+__pycache__/
+*.pyc
+ 
+# Database file
+*.db-journal
+instance/*.db
+ 
+#Metadata
+.DS_Store
+templates/.DS_Store
+ 
+>>>>>>> main
