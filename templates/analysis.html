@@ -3,6 +3,12 @@ endblock %} {% block content %}
 <div class="container">
   <h2 class="mb-4">Income & Expense Analysis</h2>
 
+  <!-- Budget Insights -->
+  <div class="alert alert-info mb-4" id="savingsTip" style="background: #e3f7ff">
+    💡 <strong>Tip:</strong> Spend less than you earn. Avoid high-interest
+    debts. Budget before you buy.
+  </div>
+
   <!-- Filter Row -->
   <div class="row mb-4 align-items-center">
     <div class="col-md-3">
@@ -33,12 +39,8 @@ endblock %} {% block content %}
         <option value="12">December</option>
       </select>
     </div>
-    <div class="col-md-3 d-flex align-items-center">
-      <button
-        class="btn signup-btn ms-md-2"
-        id="applyAnalysisFilter"
-        style="min-width: 150px"
-      >
+    <div class="col-md-3">
+      <button class="btn signup-btn w-100" id="applyAnalysisFilter" style="min-width: 150px">
         Apply Filter
       </button>
     </div>
@@ -78,17 +80,48 @@ endblock %} {% block content %}
     </div>
   </div>
 
-  <!-- Budget Insights -->
-
-  <div
-    class="alert alert-info mb-0"
-    id="savingsTip"
-    style="background: #e3f7ff"
-  >
-    💡 <strong>Tip:</strong> Spend less than you earn. Avoid high-interest
-    debts. Budget before you buy.
+  <!-- Share Analysis Modal -->
+  <div class="modal fade" id="shareAnalysisModal" tabindex="-1" aria-labelledby="shareAnalysisModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="shareAnalysisModalLabel">Share Expense/Income Distribution</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="shareAnalysisForm">
+            <div class="mb-3">
+              <label for="recipientEmail" class="form-label">Recipient Email</label>
+              <input type="email" class="form-control" id="recipientEmail" required data-current-user-email="{{ current_user_email }}">
+            </div>
+            <div class="mb-3">
+              <label for="dataType" class="form-label">Data Type</label>
+              <select class="form-select" id="dataType" required>
+                <option value="expense">Expense</option>
+                <option value="income">Income</option>
+                <option value="both">Both</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="startDate" class="form-label">Start Date</label>
+              <input type="date" class="form-control" id="startDate" required>
+            </div>
+            <div class="mb-3">
+              <label for="endDate" class="form-label">End Date</label>
+              <input type="date" class="form-control" id="endDate" required max="{{ current_date }}">
+            </div>
+            <div id="shareAnalysisMsg" class="mb-2"></div>
+            <button type="submit" class="btn btn-primary">Share</button>
+          </form>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
+ <button class="btn btn-primary fab-share-btn" data-bs-toggle="modal" data-bs-target="#shareAnalysisModal" title="Share Analysis">
+  <i class="fas fa-share-alt"></i>
+</button>
 {% endblock %} {% block scripts %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="{{ url_for('static', filename='js/analysis.js') }}"></script>

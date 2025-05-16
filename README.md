@@ -20,14 +20,16 @@ This project is a web-based Expense Tracker application designed to help users m
 - Python 3.10+
 - A virtual environment tool (e.g., `venv`)
 
-- Bootstrap 5.3.0-alpha1 
-  - CSS: https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css  
+- Bootstrap 5.3.0-alpha1
+
+  - CSS: https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css
   - JS: https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js
 
-- Font Awesome 6.0.0 
+- Font Awesome 6.0.0
+
   - CSS: https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css
 
-- Chart.js  
+- Chart.js
   - JS: https://cdn.jsdelivr.net/npm/chart.js
 
 ### Steps to Set Up the Project
@@ -57,13 +59,13 @@ This project is a web-based Expense Tracker application designed to help users m
    python app.py
    ```
 
-      or
+   or
 
    ```bash
    flask run
    ```
 
-1. **Access the Application**:
+6. **Access the Application**:
    - Open your browser and navigate to http://127.0.0.1:5000.
 
 ## Target Audience
@@ -106,3 +108,14 @@ Individuals who want to track their daily, weekly, monthly, or yearly spending a
 | 24116864 | Zixiao Ma          | CrazyDave0522    |
 
 ## Instructions for how to run the tests for the application.
+
+## Seeding Demo Users and Data
+
+To quickly add demo users and rich fake data for testing, run:
+
+```bash
+python seed_fake_data.py
+```
+
+- This will create two users and add multiple income and expense records for all categories, for every month in the last 3 years.
+- You can adjust the number of records per month by editing `entries_per_month` in the script.

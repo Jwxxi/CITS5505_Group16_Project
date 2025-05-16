@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block title %}Shared Inbox - Expense Tracker{% endblock %}
+{% block content %}
+<div class="container">
+  <h2 class="mb-4">Shared Analyses Inbox</h2>
+  {% if shared_items %}
+    <div class="list-group">
+      {% for item in shared_items %}
+        <div class="list-group-item mb-3">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <strong>From:</strong> {{ item.sharer.name }} ({{ item.sharer.email }})<br>
+              <strong>Type:</strong> {{ item.data_type|capitalize }}<br>
+              <strong>Period:</strong> {{ item.start_date }} to {{ item.end_date }}<br>
+              <strong>Shared at:</strong> {{ item.shared_at.strftime('%Y-%m-%d %H:%M') }}
+            </div>
+            <button class="btn btn-link toggle-view-btn" type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#snapshot{{ item.id }}"
+                    aria-expanded="false"
+                    aria-controls="snapshot{{ item.id }}">
+              View
+            </button>
+          </div>
+          <div class="collapse mt-2" id="snapshot{{ item.id }}">
+            {% set snapshot = item.snapshot %}
+            {% if snapshot.expense %}
+              <h6>Expense Distribution</h6>
+              <ul>
+                {% for cat, pct in snapshot.expense.items() %}
+                  <li>{{ cat }}: {{ pct }}%</li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+            {% if snapshot.income %}
+              <h6>Income Distribution</h6>
+              <ul>
+                {% for cat, pct in snapshot.income.items() %}
+                  <li>{{ cat }}: {{ pct }}%</li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="alert alert-info">No shared analyses yet.</div>
+  {% endif %}
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/shared-inbox.js') }}"></script>
+{% endblock %}
