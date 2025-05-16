@@ -37,13 +37,7 @@ endblock %} {% block content %}
     <button class="btn btn-outline-info" id="exportCsv">
       <i class="fas fa-file-export me-2"></i>Export CSV
     </button>
-    <button
-      class="btn btn-outline-warning"
-      data-bs-toggle="modal"
-      data-bs-target="#importCsvModal"
-    >
-      <i class="fas fa-file-import me-2"></i>Import CSV
-    </button>
+    
     <button
       class="btn btn-success"
       id="addTransaction"
@@ -160,49 +154,7 @@ endblock %} {% block content %}
   </div>
 </div>
 
-<!-- Import CSV Modal -->
-<div
-  class="modal fade"
-  id="importCsvModal"
-  tabindex="-1"
-  aria-labelledby="importCsvModalLabel"
-  aria-hidden="true"
->
-  <div class="modal-dialog">
-    <form
-      id="importCsvForm"
-      enctype="multipart/form-data"
-      class="modal-content p-3"
-    >
-      <!-- Add CSRF token -->
-      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-      <div class="modal-header">
-        <h5 class="modal-title">Import Transactions from CSV</h5>
-        <button
-          type="button"
-          class="btn-close"
-          data-bs-dismiss="modal"
-          aria-label="Close"
-        ></button>
-      </div>
-      <div class="modal-body">
-        <input
-          type="file"
-          name="file"
-          class="form-control"
-          accept=".csv"
-          required
-        />
-        <div class="form-text mt-2">
-          Expected CSV: date, description, amount, category_id
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="submit" class="btn btn-primary w-100">Upload CSV</button>
-      </div>
-    </form>
-  </div>
-</div>
+
 
 {% endblock %} {% block scripts %}
 <script src="{{ url_for('static', filename='js/transactions.js') }}"></script>

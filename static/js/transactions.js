@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
   const transactionForm = document.getElementById("transactionForm");
-  const importCsvForm = document.getElementById("importCsvForm");
+  
   const categorySelect = document.querySelector("select[name='category_id']");
   const transactionsTableBody = document.getElementById(
     "transactionsTableBody"
@@ -252,26 +252,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.body.removeChild(link);
   });
 
-  importCsvForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const formData = new FormData(importCsvForm);
-
-    try {
-      const res = await fetch("/import-csv", {
-        method: "POST",
-        body: formData,
-      });
-      if (!res.ok) throw new Error("Failed to import CSV");
-      bootstrap.Modal.getInstance(
-        document.getElementById("importCsvModal")
-      ).hide();
-      importCsvForm.reset();
-      fetchTransactions();
-    } catch (err) {
-      console.error("Import CSV error:", err);
-      alert("Import failed.");
-    }
-  });
+  
 
   fetchCategories();
   fetchTransactions();
