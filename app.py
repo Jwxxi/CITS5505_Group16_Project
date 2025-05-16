@@ -24,7 +24,7 @@ import traceback
 # Backend functionality for CSV Export and Import
 from flask import send_file
 import csv
-from io import StringIO
+from io import StringIO, BytesIO
 
 
 app = Flask(__name__)
@@ -332,9 +332,12 @@ def export_transactions():
             ]
         )
 
-    si.seek(0)
+    output = si.getvalue().encode('utf-8')  # Convert string to bytes
+    bio = BytesIO(output)  # Use BytesIO instead of StringIO
+    bio.seek(0)
+    
     return send_file(
-        StringIO(si.read()),
+        bio,
         mimetype="text/csv",
         as_attachment=True,
         download_name="transactions.csv",
