@@ -37,21 +37,6 @@ class Item(db.Model):
     category = db.relationship("Category", backref="items")
 
 
-class SharedAnalysis(db.Model):
-    __tablename__ = "shared_analyses"
-    id = db.Column(db.Integer, primary_key=True)
-    sharer_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-    recipient_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-    start_date = db.Column(db.Date, nullable=False)
-    end_date = db.Column(db.Date, nullable=False)
-    shared_at = db.Column(db.DateTime, default=db.func.current_timestamp(), nullable=False)
-    data_type = db.Column(db.String, nullable=False)  # 'income', 'expense', or 'both'
-    snapshot_json = db.Column(db.Text, nullable=False)  # Store the computed percentages as JSON
-
-    sharer = db.relationship("User", foreign_keys=[sharer_id])
-    recipient = db.relationship("User", foreign_keys=[recipient_id])
-
-
 
 
 def preload_categories():

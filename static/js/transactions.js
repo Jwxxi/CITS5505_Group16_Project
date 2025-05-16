@@ -135,63 +135,48 @@ document.addEventListener("DOMContentLoaded", () => {
     searchInput.value = "";
   });
 
-  transactionForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const formData = new FormData(transactionForm);
-    const id = formData.get("transaction_id");
-
-    const payload = {
-      description: formData.get("description"),
-      amount: parseFloat(formData.get("amount")),
-      category_id: parseInt(formData.get("category_id")),
-      date: formData.get("date"),
-    };
-
-    const method = id ? "PUT" : "POST";
-    const url = id ? `/api/transactions/${id}` : "/api/transactions";
-
-    try {
-      const res = await fetch(url, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      if (!res.ok) throw new Error("Failed to save transaction");
-      bootstrap.Modal.getInstance(document.getElementById("addTransactionModal")).hide();
-      transactionForm.reset();
-      fetchTransactions();
-    } catch (err) {
-      console.error("Submit error:", err);
-    }
-  });
 
   transactionsTableBody.addEventListener("click", async (e) => {
     const id = e.target.dataset.id;
 
     if (e.target.classList.contains("delete-btn")) {
-      if (confirm("Are you sure you want to delete this transaction?")) {
-        try {
-          await fetch(`/api/transactions/${id}`, { method: "DELETE" });
-          fetchTransactions();
-        } catch (err) {
-          console.error("Delete failed:", err);
-        }
-      }
+  if (confirm("Are you sure you want to delete this transaction?")) {
+    const form = document.createElement("form");
+    form.method = "POST";
+    form.action = `/delete-transaction/${id}`;
+
+    // CSRF token if needed
+    const csrfToken = document.querySelector("input[name='csrf_token']");
+    if (csrfToken) {
+      const hiddenCsrf = document.createElement("input");
+      hiddenCsrf.type = "hidden";
+      hiddenCsrf.name = "csrf_token";
+      hiddenCsrf.value = csrfToken.value;
+      form.appendChild(hiddenCsrf);
     }
+
+    document.body.appendChild(form);
+    form.submit();
+  }
+}
+
 
     if (e.target.classList.contains("edit-btn")) {
-      const tx = allTransactions.find(t => t.id == id);
-      if (!tx) return;
+  const tx = allTransactions.find(t => t.id == id);
+  if (!tx) return;
 
-      document.getElementById("transactionId").value = tx.id;
-      transactionForm.description.value = tx.description;
-      transactionForm.amount.value = tx.amount;
-      transactionForm.category_id.value = getCategoryIdByName(tx.category);
-      transactionForm.date.value = tx.date;
+  // Set form values
+  document.querySelector("input[name='transaction_id']").value = tx.id;
+  document.querySelector("input[name='description']").value = tx.description;
+  document.querySelector("input[name='amount']").value = tx.amount;
+  document.querySelector("select[name='category_id']").value = tx.category_id;
+  document.querySelector("input[name='date']").value = tx.date;
 
-      const modal = new bootstrap.Modal(document.getElementById("addTransactionModal"));
-      modal.show();
-    }
+  // Open the modal
+  const modal = new bootstrap.Modal(document.getElementById("addTransactionModal"));
+  modal.show();
+}
+
   });
 
   exportCsvBtn.addEventListener("click", () => {
@@ -235,6 +220,15 @@ document.addEventListener("DOMContentLoaded", () => {
       alert("Import failed.");
     }
   });
+
+  // Reset the form completely when Add Transaction is clicked
+window.resetTransactionForm = function () {
+  document.querySelector("input[name='transaction_id']").value = "";
+  document.querySelector("input[name='description']").value = "";
+  document.querySelector("input[name='amount']").value = "";
+  document.querySelector("select[name='category_id']").value = "";
+  document.querySelector("input[name='date']").value = "";
+};
 
   fetchCategories();
   fetchTransactions();
