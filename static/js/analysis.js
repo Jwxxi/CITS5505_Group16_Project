@@ -271,3 +271,13 @@ document.addEventListener("DOMContentLoaded", function () {
     startDateInput.setAttribute("max", today);
   }
 });
+
+// Accessibility fix: move focus after modal closes
+document.addEventListener("DOMContentLoaded", function () {
+  const shareAnalysisModal = document.getElementById("shareAnalysisModal");
+  if (shareAnalysisModal) {
+    shareAnalysisModal.addEventListener("hidden.bs.modal", function () {
+      document.getElementById("applyAnalysisFilter")?.focus();
+    });
+  }
+});

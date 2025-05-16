@@ -276,3 +276,13 @@ document.addEventListener("DOMContentLoaded", () => {
   fetchCategories();
   fetchTransactions();
 });
+
+// Accessibility fix: move focus after modal closes
+document.addEventListener("DOMContentLoaded", function () {
+  const addTransactionModal = document.getElementById("addTransactionModal");
+  if (addTransactionModal) {
+    addTransactionModal.addEventListener("hidden.bs.modal", function () {
+      document.getElementById("addTransaction")?.focus();
+    });
+  }
+});
