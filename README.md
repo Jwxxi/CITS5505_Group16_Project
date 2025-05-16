@@ -4,12 +4,35 @@
 
 This project is a web-based Expense Tracker application designed to help users manage and visualize their personal income and expenses.
 
-## Features
+## Target Audience
 
-- User registration and login
-- Record income and expenses
-- Analyze spending/income trends with charts
-- Export and share analysis results
+Individuals who want to track their daily, weekly, monthly, or yearly spending and income to better understand their financial situation and make informed decisions.
+
+## Key Features
+
+### 1. User Onboarding
+
+- **User Registration:** Allows new users to create an account.
+- **User Login:** Enables existing users to access their expense data.
+- **Application Description:** Provides an introductory overview of the application's purpose and how to use it.
+
+### 2. Income/Expense Recording
+
+- **Add Transaction:** Users can record new income or expense items.
+- **Remove Transaction:** Users can delete existing transaction records.
+- **Transaction Details:** Each recorded item includes essential information such as Name, Category, Amount, and Date.
+
+### 3. Data Analysis
+
+- **Category-based Pie Chart:** Visual representation of spending distribution across different categories.
+- **Time-based Line Chart:** Illustrates spending trends over a selected period.
+- **Expense List View:** Displays a detailed list of transactions, with options to sort (e.g., by highest expense) and filter by time frame.
+
+### 4. Data Sharing & Export
+
+- **Share Analysis:** Allows users to share their analysis results (charts, lists).
+- **Timeframe Selection:** Users can select a specific period for the data to be shared.
+- **Export Functionality:** Enables users to export analysis results (e.g., as an image) for local saving.
 
 ---
 
@@ -68,36 +91,6 @@ This project is a web-based Expense Tracker application designed to help users m
 6. **Access the Application**:
    - Open your browser and navigate to http://127.0.0.1:5000.
 
-## Target Audience
-
-Individuals who want to track their daily, weekly, monthly, or yearly spending and income to better understand their financial situation and make informed decisions.
-
-## Key Features
-
-### 1. User Onboarding
-
-- **User Registration:** Allows new users to create an account.
-- **User Login:** Enables existing users to access their expense data.
-- **Application Description:** Provides an introductory overview of the application's purpose and how to use it.
-
-### 2. Income/Expense Recording
-
-- **Add Transaction:** Users can record new income or expense items.
-- **Remove Transaction:** Users can delete existing transaction records.
-- **Transaction Details:** Each recorded item includes essential information such as Name, Category, Amount, and Date.
-
-### 3. Data Analysis
-
-- **Category-based Pie Chart:** Visual representation of spending distribution across different categories.
-- **Time-based Line Chart:** Illustrates spending trends over a selected period.
-- **Expense List View:** Displays a detailed list of transactions, with options to sort (e.g., by highest expense) and filter by time frame.
-
-### 4. Data Sharing & Export
-
-- **Share Analysis:** Allows users to share their analysis results (charts, lists).
-- **Timeframe Selection:** Users can select a specific period for the data to be shared.
-- **Export Functionality:** Enables users to export analysis results (e.g., as an image) for local saving.
-
 ## Team Members
 
 | UWA ID   | name               | Github user name |
@@ -109,13 +102,42 @@ Individuals who want to track their daily, weekly, monthly, or yearly spending a
 
 ## Instructions for how to run the tests for the application.
 
-## Seeding Demo Users and Data
+### Unit Tests
 
-To quickly add demo users and rich fake data for testing, run:
+To run the unit tests:
+
+Make sure your virtual environment is activated.
+
+From the root directory of the project, run:
 
 ```bash
-python seed_fake_data.py
+python -m unittest tests/unit\ tests/test_app.py
 ```
 
-- This will create two users and add multiple income and expense records for all categories, for every month in the last 3 years.
-- You can adjust the number of records per month by editing `entries_per_month` in the script.
+This will execute 13 unit tests covering key components of the application.
+
+### Selenium Tests
+
+To run the end-to-end Selenium tests:
+
+Navigate to the tests/selenium directory:
+
+```bash
+cd tests/selenium\ tests
+```
+
+Then run:
+
+```bash
+python test_sign_up.py
+python test_sign_in.py
+python test_add_transaction.py
+python test_edit_transaction.py
+python test_delete_transaction.py
+python test_analysis_page.py
+python test_edit_profile.py
+python test_shared_inbox.py
+```
+
+These tests cover core user flows such as sign up, login, manual expense upload, and sharing functionality, etc.
+
