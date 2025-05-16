@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}Data Shared With Me - Expense Tracker{% endblock %}
+
+{% block content %}
+<div class="container">
+  <h2 class="mb-4">Files Shared With You</h2>
+
+  {% if shared_entries %}
+    <ul class="list-group mb-4">
+      {% for entry in shared_entries %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          <div>
+            <strong>{{ entry.owner.name }}</strong> shared a file.
+            <br />
+            <small class="text-muted">Shared on {{ entry.timestamp.strftime('%Y-%m-%d %H:%M') }}</small>
+          </div>
+          <a
+            href="{{ url_for('static', filename=entry.file_path) }}"
+            class="btn btn-sm btn-outline-primary"
+            download
+          >
+            Download
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <div class="alert alert-info">No data has been shared with you yet.</div>
+  {% endif %}
+
+  <a href="{{ url_for('transactions') }}" class="btn btn-secondary">
+    <i class="fas fa-arrow-left me-2"></i>Back to Transactions
+  </a>
+</div>
+{% endblock %}

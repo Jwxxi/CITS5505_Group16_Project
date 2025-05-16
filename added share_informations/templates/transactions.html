@@ -1,0 +1,222 @@
+{% extends 'base.html' %} {% block title %}My Transactions - Expense Tracker{%
+endblock %} {% block content %}
+
+<!-- Filter Controls -->
+<div
+  class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2"
+>
+  <div class="d-flex flex-wrap gap-2">
+    <select id="yearFilter" class="form-select w-auto">
+      <option value="">Select Year</option>
+    </select>
+    <select id="monthFilter" class="form-select w-auto">
+      <option value="">Select Month</option>
+      <option value="1">January</option>
+      <option value="2">February</option>
+      <option value="3">March</option>
+      <option value="4">April</option>
+      <option value="5">May</option>
+      <option value="6">June</option>
+      <option value="7">July</option>
+      <option value="8">August</option>
+      <option value="9">September</option>
+      <option value="10">October</option>
+      <option value="11">November</option>
+      <option value="12">December</option>
+    </select>
+    <input
+      type="text"
+      id="descriptionSearch"
+      class="form-control w-auto"
+      placeholder="Search description..."
+    />
+    <button class="btn btn-primary" id="applyFilter">Apply</button>
+    <button class="btn btn-secondary" id="showAll">Show All</button>
+  </div>
+  <div class="d-flex gap-2">
+    <button class="btn btn-outline-info" id="exportCsv">
+      <i class="fas fa-file-export me-2"></i>Export CSV
+    </button>
+    <button
+      class="btn btn-outline-warning"
+      data-bs-toggle="modal"
+      data-bs-target="#importCsvModal"
+    >
+      <i class="fas fa-file-import me-2"></i>Import CSV
+    </button>
+    <form method="POST" action="{{ url_for('export_and_share') }}" class="d-flex align-items-center gap-2 mt-2">
+  <select name="shared_with_id" class="form-select w-auto" required>
+    <option value="">Share with...</option>
+    {% for user in all_users %}
+      {% if user.id != current_user.id %}
+        <option value="{{ user.id }}">{{ user.name }}</option>
+      {% endif %}
+    {% endfor %}
+  </select>
+  <button type="submit" class="btn btn-outline-success">
+    <i class="fas fa-share me-2"></i>Export & Share
+  </button>
+</form>
+
+    <button
+      class="btn btn-success"
+      id="addTransaction"
+      data-bs-toggle="modal"
+      data-bs-target="#addTransactionModal"
+    >
+      <i class="fas fa-plus me-2"></i>Add Transaction
+    </button>
+      <a href="{{ url_for('shared_with_me') }}" class="btn btn-outline-primary">
+    <i class="fas fa-share-alt me-2"></i>Data Shared With Me
+  </a>
+  </div>
+</div>
+
+
+  <!-- Summary area -->
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <div class="form-card summary-card text-center">
+        <h6 class="text-muted mb-1">Total Income</h6>
+        <h3 id="totalIncome" class="text-success fw-bold">$1000.00</h3>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="form-card summary-card text-center">
+        <h6 class="text-muted mb-1">Total Expense</h6>
+        <h3 id="totalExpense" class="text-danger fw-bold">$420.00</h3>
+      </div>
+    </div>
+  </div>
+
+  <!-- Table area -->
+  <table class="custom-table">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Category</th>
+        <th>Description</th>
+        <th>Amount</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="transactionsTableBody"></tbody>
+  </table>
+</div>
+
+<!-- Add/Edit Transaction Modal -->
+<div
+  class="modal fade"
+  id="addTransactionModal"
+  tabindex="-1"
+  aria-labelledby="addTransactionModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="transactionForm" class="p-3">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addTransactionModalLabel">
+            Add Transaction
+          </h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" name="transaction_id" id="transactionId" />
+          <input
+            type="text"
+            name="description"
+            class="form-control custom-input mb-3"
+            placeholder="Description"
+            required
+          />
+          <input
+            type="number"
+            name="amount"
+            class="form-control custom-input mb-3"
+            placeholder="Amount"
+            step="0.01"
+            required
+          />
+          <select
+            name="category_id"
+            class="form-select custom-input mb-3"
+            required
+          >
+            <option value="">Select Category</option>
+            <optgroup label="Income">
+              {% for category in categories if category.type == 'income' %}
+              <option value="{{ category.id }}">{{ category.name }}</option>
+              {% endfor %}
+            </optgroup>
+            <optgroup label="Expense">
+              {% for category in categories if category.type == 'expense' %}
+              <option value="{{ category.id }}">{{ category.name }}</option>
+              {% endfor %}
+            </optgroup>
+          </select>
+          <input
+            type="date"
+            name="date"
+            class="form-control custom-input mb-3"
+            required
+          />
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary w-100">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Import CSV Modal -->
+<div
+  class="modal fade"
+  id="importCsvModal"
+  tabindex="-1"
+  aria-labelledby="importCsvModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <form
+      id="importCsvForm"
+      enctype="multipart/form-data"
+      class="modal-content p-3"
+    >
+      <div class="modal-header">
+        <h5 class="modal-title">Import Transactions from CSV</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <input
+          type="file"
+          name="file"
+          class="form-control"
+          accept=".csv"
+          required
+        />
+        <div class="form-text mt-2">
+          Expected CSV: date, description, amount, category_id
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-primary w-100">Upload CSV</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% endblock %} {% block scripts %}
+<script src="{{ url_for('static', filename='js/transactions.js') }}"></script>
+{% endblock %}
