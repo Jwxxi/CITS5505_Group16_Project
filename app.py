@@ -402,8 +402,8 @@ def share_analysis():
         # Query items for the current user in the date range
         items_query = Item.query.filter(
             Item.user_id == current_user.id,
-            Item.created_at >= start_date,
-            Item.created_at <= end_date,
+            Item.created_at >= datetime.strptime(start_date, "%Y-%m-%d"),
+            Item.created_at <= datetime.strptime(end_date, "%Y-%m-%d"),
         )
 
         # Prepare snapshot
@@ -415,11 +415,11 @@ def share_analysis():
             for item in expenses:
                 cat = item.category.name
                 expense_dist[cat] = expense_dist.get(cat, 0) + item.amount
-            # Convert to percentages
+            # Convert to percentages with two decimal places
             expense_percent = {
-                cat: round((amt / total_expense) * 100, 2) if total_expense else 0
+                cat: round((amt / total_expense) * 100, 2)
                 for cat, amt in expense_dist.items()
-            }
+            } if total_expense > 0 else {}
             snapshot["expense"] = expense_percent
 
         if data_type in ("income", "both"):
@@ -429,10 +429,11 @@ def share_analysis():
             for item in incomes:
                 cat = item.category.name
                 income_dist[cat] = income_dist.get(cat, 0) + item.amount
+            # Convert to percentages with two decimal places
             income_percent = {
-                cat: round((amt / total_income) * 100, 2) if total_income else 0
+                cat: round((amt / total_income) * 100, 2)
                 for cat, amt in income_dist.items()
-            }
+            } if total_income > 0 else {}
             snapshot["income"] = income_percent
 
         # Convert date strings to Python date objects
