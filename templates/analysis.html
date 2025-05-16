@@ -1,29 +1,26 @@
-{% extends 'base.html' %} {% block title %}Spending Analysis - Expense Tracker{%
-endblock %} {% block content %}
-<div class="container">
-  <h2 class="mb-4">Income & Expense Analysis</h2>
+{% extends 'base.html' %}
 
-  <!-- Budget Insights -->
-  <div class="alert alert-info mb-4" id="savingsTip" style="background: #e3f7ff">
-    💡 <strong>Tip:</strong> Spend less than you earn. Avoid high-interest
-    debts. Budget before you buy.
-  </div>
+{% block title %}Spending Analysis - Expense Tracker{% endblock %}
 
-  <!-- Filter Row -->
-  <div class="row mb-4 align-items-center">
+{% block content %}
+<div class="container-fluid">
+  <h2 class="text-white mb-4">Spending & Expense Analysis</h2>
+
+  <!-- Filters -->
+  <div class="row mb-4">
     <div class="col-md-3">
-      <select id="analysisType" class="form-select custom-input">
+      <select id="analysisType" class="form-select">
         <option value="expense">Expenses</option>
         <option value="income">Income</option>
       </select>
     </div>
     <div class="col-md-3">
-      <select id="analysisYear" class="form-select custom-input">
+      <select id="analysisYear" class="form-select">
         <option value="">Select Year</option>
       </select>
     </div>
     <div class="col-md-3">
-      <select id="analysisMonth" class="form-select custom-input">
+      <select id="analysisMonth" class="form-select">
         <option value="">Select Month</option>
         <option value="1">January</option>
         <option value="2">February</option>
@@ -40,89 +37,58 @@ endblock %} {% block content %}
       </select>
     </div>
     <div class="col-md-3">
-      <button class="btn signup-btn w-100" id="applyAnalysisFilter" style="min-width: 150px">
-        Apply Filter
-      </button>
+      <button class="btn btn-primary w-100" id="applyAnalysisFilter">Apply Filter</button>
     </div>
   </div>
 
-  <!-- Charts Row -->
+  <!-- Charts -->
   <div class="row mb-4">
-    <div class="col-md-6 mb-4 mb-md-0">
-      <div class="form-card h-100 d-flex flex-column justify-content-center">
+    <div class="col-lg-6 mb-4">
+      <div class="card p-3 bg-dark text-white shadow">
         <h5 class="text-center mb-3">Category Breakdown</h5>
         <canvas id="categoryChart" height="250"></canvas>
       </div>
     </div>
-    <div class="col-md-6">
-      <div class="form-card h-100 d-flex flex-column justify-content-center">
+    <div class="col-lg-6 mb-4">
+      <div class="card p-3 bg-dark text-white shadow">
         <h5 class="text-center mb-3">Monthly Trend</h5>
         <canvas id="monthlyChart" height="250"></canvas>
       </div>
     </div>
   </div>
 
-  <!-- Table Row -->
-  <div class="form-card mb-4">
-    <h5 class="mb-3">Detailed Transactions</h5>
-    <div class="table-responsive">
-      <table class="custom-table">
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Category</th>
-            <th>Description</th>
-            <th>Amount</th>
-          </tr>
-        </thead>
-        <tbody id="analysisTableBody"></tbody>
-      </table>
+  <!-- Expense Table -->
+  <div class="card mb-4 bg-dark text-white shadow">
+    <div class="card-body">
+      <h5 class="card-title">Detailed Transactions</h5>
+      <div class="table-responsive">
+        <table class="table table-hover table-bordered text-white">
+          <thead class="table-light text-dark">
+            <tr>
+              <th>Date</th>
+              <th>Category</th>
+              <th>Description</th>
+              <th>Amount</th>
+            </tr>
+          </thead>
+          <tbody id="analysisTableBody"></tbody>
+        </table>
+      </div>
     </div>
   </div>
 
-  <!-- Share Analysis Modal -->
-  <div class="modal fade" id="shareAnalysisModal" tabindex="-1" aria-labelledby="shareAnalysisModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="shareAnalysisModalLabel">Share Expense/Income Distribution</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <form id="shareAnalysisForm">
-            <div class="mb-3">
-              <label for="recipientEmail" class="form-label">Recipient Email</label>
-              <input type="email" class="form-control" id="recipientEmail" required data-current-user-email="{{ current_user_email }}">
-            </div>
-            <div class="mb-3">
-              <label for="dataType" class="form-label">Data Type</label>
-              <select class="form-select" id="dataType" required>
-                <option value="expense">Expense</option>
-                <option value="income">Income</option>
-                <option value="both">Both</option>
-              </select>
-            </div>
-            <div class="mb-3">
-              <label for="startDate" class="form-label">Start Date</label>
-              <input type="date" class="form-control" id="startDate" required>
-            </div>
-            <div class="mb-3">
-              <label for="endDate" class="form-label">End Date</label>
-              <input type="date" class="form-control" id="endDate" required max="{{ current_date }}">
-            </div>
-            <div id="shareAnalysisMsg" class="mb-2"></div>
-            <button type="submit" class="btn btn-primary">Share</button>
-          </form>
-        </div>
+  <!-- Budget Insights -->
+  <div class="row">
+    <div class="col-md-12">
+      <div class="alert alert-info shadow-lg" id="savingsTip">
+        💡 <strong>Tip:</strong> Spend less than you earn. Avoid high-interest debts. Budget before you buy.
       </div>
     </div>
   </div>
 </div>
- <button class="btn btn-primary fab-share-btn" data-bs-toggle="modal" data-bs-target="#shareAnalysisModal" title="Share Analysis">
-  <i class="fas fa-share-alt"></i>
-</button>
-{% endblock %} {% block scripts %}
+{% endblock %}
+
+{% block scripts %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="{{ url_for('static', filename='js/analysis.js') }}"></script>
 {% endblock %}
