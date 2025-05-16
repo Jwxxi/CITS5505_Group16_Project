@@ -356,3 +356,90 @@ body {
   margin-left: 0;
   margin-right: 0;
 }
+
+/* Floating Action Button for Share Analysis */
+.fab-share-btn {
+  position: fixed;
+  bottom: 40px;
+  right: 40px;
+  z-index: 1050;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  font-size: 1.7rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  padding: 0;
+}
+.fab-share-btn i {
+  margin: 0;
+}
+@media (max-width: 768px) {
+  .fab-share-btn {
+    right: 16px;
+    bottom: 16px;
+    width: 50px;
+    height: 50px;
+    font-size: 1.2rem;
+  }
+}
+
+/* Shared Inbox Styles */
+.list-group-item {
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  border: 1px solid #f0f0f0;
+  background: #fff;
+  margin-bottom: 18px;
+  padding: 1.5rem 1.5rem 1rem 1.5rem;
+  transition: box-shadow 0.2s;
+}
+.list-group-item:hover {
+  box-shadow: 0 4px 16px rgba(255,193,7,0.10);
+  border-color: #ffe082;
+}
+
+.list-group-item h6 {
+  color: #ff9800;
+  font-weight: 600;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.list-group-item ul {
+  padding-left: 1.2rem;
+  margin-bottom: 0.5rem;
+}
+
+.list-group-item li {
+  font-size: 1rem;
+  color: #333;
+  margin-bottom: 0.25rem;
+  padding-left: 0.2rem;
+}
+
+.list-group-item strong {
+  color: #333;
+}
+
+.btn-link[data-bs-toggle="collapse"] {
+  color: #ffc107;
+  font-weight: 600;
+  text-decoration: none;
+  font-size: 1rem;
+  transition: color 0.2s;
+}
+.btn-link[data-bs-toggle="collapse"]:hover {
+  color: #ff9800;
+  text-decoration: underline;
+}
+
+.collapse.mt-2 {
+  background: #fffbe6;
+  border-radius: 8px;
+  padding: 1rem 1.2rem;
+  margin-top: 1rem;
+  border: 1px solid #ffe082;
+}

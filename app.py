@@ -12,12 +12,14 @@ from flask_login import (
 from flask_migrate import Migrate
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.exc import SQLAlchemyError
-from model import db, preload_categories, User, Item, Category
-from datetime import datetime
+from model import db, preload_categories, User, Item, Category, SharedAnalysis
+from datetime import datetime, date
 import os
 import csv
 from io import StringIO
 from flask import Response
+import json
+import traceback
 
 # Backend functionality for CSV Export and Import
 from flask import send_file
@@ -131,7 +133,7 @@ def transactions():
 @app.route("/analysis")
 @login_required
 def analysis():
-    return render_template("analysis.html", user=current_user)
+    return render_template("analysis.html", current_date=date.today().isoformat(), current_user_email=current_user.email)
 
 
 @app.route("/profile", methods=["GET", "POST"])
@@ -373,6 +375,137 @@ def import_transactions():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+# ==============================
+# API: Share Analysis
+# ==============================
+@app.route("/api/share-analysis", methods=["POST"])
+@login_required
+def share_analysis():
+    try:
+        data = request.json
+        recipient_email = data.get("recipient_email")
+        start_date = data.get("start_date")
+        end_date = data.get("end_date")
+        data_type = data.get("data_type")
+
+        # Validate required fields
+        if not all([recipient_email, start_date, end_date, data_type]):
+            return jsonify({"success": False, "message": "Missing required fields."}), 400
+
+        # Find recipient user
+        recipient = User.query.filter_by(email=recipient_email).first()
+        if not recipient:
+            return jsonify({"success": False, "message": "Recipient not found."}), 404
+
+        # Query items for the current user in the date range
+        items_query = Item.query.filter(
+            Item.user_id == current_user.id,
+            Item.created_at >= datetime.strptime(start_date, "%Y-%m-%d"),
+            Item.created_at <= datetime.strptime(end_date, "%Y-%m-%d"),
+        )
+
+        # Prepare snapshot
+        snapshot = {}
+        if data_type in ("expense", "both"):
+            expenses = [item for item in items_query if item.category.type == "expense"]
+            total_expense = sum(item.amount for item in expenses)
+            expense_dist = {}
+            for item in expenses:
+                cat = item.category.name
+                expense_dist[cat] = expense_dist.get(cat, 0) + item.amount
+            # Convert to percentages with two decimal places
+            expense_percent = {
+                cat: round((amt / total_expense) * 100, 2)
+                for cat, amt in expense_dist.items()
+            } if total_expense > 0 else {}
+            snapshot["expense"] = expense_percent
+
+        if data_type in ("income", "both"):
+            incomes = [item for item in items_query if item.category.type == "income"]
+            total_income = sum(item.amount for item in incomes)
+            income_dist = {}
+            for item in incomes:
+                cat = item.category.name
+                income_dist[cat] = income_dist.get(cat, 0) + item.amount
+            # Convert to percentages with two decimal places
+            income_percent = {
+                cat: round((amt / total_income) * 100, 2)
+                for cat, amt in income_dist.items()
+            } if total_income > 0 else {}
+            snapshot["income"] = income_percent
+
+        # Convert date strings to Python date objects
+        start_date_obj = datetime.strptime(start_date, "%Y-%m-%d").date()
+        end_date_obj = datetime.strptime(end_date, "%Y-%m-%d").date()
+
+        # Store snapshot as JSON
+        shared = SharedAnalysis(
+            sharer_id=current_user.id,
+            recipient_id=recipient.id,
+            start_date=start_date_obj,
+            end_date=end_date_obj,
+            data_type=data_type,
+            snapshot_json=json.dumps(snapshot),
+        )
+        db.session.add(shared)
+        db.session.commit()
+
+        return jsonify({"success": True, "message": "Analysis shared successfully."})
+    except Exception as e:
+        print("Error in /api/share-analysis:", e)
+        traceback.print_exc()
+        return jsonify({"success": False, "message": "Internal server error."}), 500
+
+
+@app.route("/shared-inbox")
+@login_required
+def shared_inbox():
+    shared_items = SharedAnalysis.query.filter_by(recipient_id=current_user.id).order_by(SharedAnalysis.shared_at.desc()).all()
+    # Parse snapshot_json for each item
+    for item in shared_items:
+        item.snapshot = json.loads(item.snapshot_json)
+    return render_template("shared-inbox.html", shared_items=shared_items)
+
+
+@app.route("/api/check-email", methods=["POST"])
+@login_required
+def check_email():
+    data = request.json
+    email = data.get("email")
+    user = User.query.filter_by(email=email).first()
+    if user:
+        return jsonify({"exists": True})
+    else:
+        return jsonify({"exists": False})
+
+
+@app.route("/api/check-items-exist", methods=["POST"])
+@login_required
+def check_items_exist():
+    data = request.json
+    start_date = data.get("start_date")
+    end_date = data.get("end_date")
+    data_type = data.get("data_type")  # 'income', 'expense', or 'both'
+
+    from datetime import datetime
+
+    start_date_obj = datetime.strptime(start_date, "%Y-%m-%d").date()
+    end_date_obj = datetime.strptime(end_date, "%Y-%m-%d").date()
+
+    query = Item.query.filter(
+        Item.user_id == current_user.id,
+        Item.created_at >= start_date_obj,
+        Item.created_at <= end_date_obj
+    )
+
+    if data_type != "both":
+        # Join with Category to filter by type
+        query = query.join(Category).filter(Category.type == data_type)
+
+    count = query.count()
+    return jsonify({"count": count})
 
 
 if __name__ == "__main__":
