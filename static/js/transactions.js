@@ -2,7 +2,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const transactionForm = document.getElementById("transactionForm");
   const importCsvForm = document.getElementById("importCsvForm");
   const categorySelect = document.querySelector("select[name='category_id']");
-  const transactionsTableBody = document.getElementById("transactionsTableBody");
+  const transactionsTableBody = document.getElementById(
+    "transactionsTableBody"
+  );
   const yearFilter = document.getElementById("yearFilter");
   const monthFilter = document.getElementById("monthFilter");
   const searchInput = document.getElementById("descriptionSearch");
@@ -15,6 +17,11 @@ document.addEventListener("DOMContentLoaded", () => {
   let allTransactions = [];
   let categoryMap = {};
 
+  // Get CSRF token from meta tag
+  const csrfToken = document
+    .querySelector('meta[name="csrf-token"]')
+    .getAttribute("content");
+
   async function fetchCategories() {
     try {
       const res = await fetch("/api/categories");
@@ -24,7 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
       categorySelect.innerHTML = '<option value="">Select Category</option>';
       const grouped = { income: [], expense: [] };
 
-      data.forEach(cat => {
+      data.forEach((cat) => {
         categoryMap[cat.name] = cat.id;
         if (grouped[cat.type]) grouped[cat.type].push(cat);
       });
@@ -32,7 +39,7 @@ document.addEventListener("DOMContentLoaded", () => {
       for (const type of ["income", "expense"]) {
         const optgroup = document.createElement("optgroup");
         optgroup.label = type.charAt(0).toUpperCase() + type.slice(1);
-        grouped[type].forEach(cat => {
+        grouped[type].forEach((cat) => {
           const option = document.createElement("option");
           option.value = cat.id;
           option.textContent = cat.name;
@@ -40,7 +47,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
         categorySelect.appendChild(optgroup);
       }
-
     } catch (err) {
       console.error("Error loading categories:", err);
     }
@@ -64,9 +70,11 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function populateYearOptions(transactions) {
-    const years = new Set(transactions.map(tx => new Date(tx.date).getFullYear()));
+    const years = new Set(
+      transactions.map((tx) => new Date(tx.date).getFullYear())
+    );
     yearFilter.innerHTML = '<option value="">Select Year</option>';
-    [...years].sort().forEach(year => {
+    [...years].sort().forEach((year) => {
       yearFilter.innerHTML += `<option value="${year}">${year}</option>`;
     });
   }
@@ -79,12 +87,18 @@ document.addEventListener("DOMContentLoaded", () => {
         <td style="color:white;">${new Date(tx.date).toLocaleDateString()}</td>
         <td style="color:white;">${tx.category || "-"}</td>
         <td style="color:white;">${tx.description || "-"}</td>
-        <td style="color:white;" class="${tx.type === "income" ? "text-success" : "text-danger"}">
+        <td style="color:white;" class="${
+          tx.type === "income" ? "text-success" : "text-danger"
+        }">
           $${tx.amount ? tx.amount.toFixed(2) : "0.00"}
         </td>
         <td>
-          <button class="btn btn-sm btn-warning edit-btn" data-id="${tx.id}">Edit</button>
-          <button class="btn btn-sm btn-danger delete-btn" data-id="${tx.id}">Delete</button>
+          <button class="btn btn-sm btn-warning edit-btn" data-id="${
+            tx.id
+          }">Edit</button>
+          <button class="btn btn-sm btn-danger delete-btn" data-id="${
+            tx.id
+          }">Delete</button>
         </td>
       `;
       transactionsTableBody.appendChild(row);
@@ -98,15 +112,22 @@ document.addEventListener("DOMContentLoaded", () => {
     const searchTerm = searchInput.value.toLowerCase();
 
     if (selectedYear) {
-      filtered = filtered.filter(tx => new Date(tx.date).getFullYear().toString() === selectedYear);
+      filtered = filtered.filter(
+        (tx) => new Date(tx.date).getFullYear().toString() === selectedYear
+      );
     }
 
     if (selectedMonth) {
-      filtered = filtered.filter(tx => (new Date(tx.date).getMonth() + 1).toString() === selectedMonth);
+      filtered = filtered.filter(
+        (tx) => (new Date(tx.date).getMonth() + 1).toString() === selectedMonth
+      );
     }
 
     if (searchTerm) {
-      filtered = filtered.filter(tx => tx.description && tx.description.toLowerCase().includes(searchTerm));
+      filtered = filtered.filter(
+        (tx) =>
+          tx.description && tx.description.toLowerCase().includes(searchTerm)
+      );
     }
 
     renderTransactions(filtered);
@@ -115,11 +136,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function updateTotals(transactions) {
     const expenseTotal = transactions
-      .filter(tx => tx.type === "expense")
+      .filter((tx) => tx.type === "expense")
       .reduce((sum, tx) => sum + tx.amount, 0);
 
     const incomeTotal = transactions
-      .filter(tx => tx.type === "income")
+      .filter((tx) => tx.type === "income")
       .reduce((sum, tx) => sum + tx.amount, 0);
 
     totalExpenseEl.textContent = `$${expenseTotal.toFixed(2)}`;
@@ -153,13 +174,20 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       const res = await fetch(url, {
         method,
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "X-CSRFToken": csrfToken,
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(payload),
       });
       if (!res.ok) throw new Error("Failed to save transaction");
-      bootstrap.Modal.getInstance(document.getElementById("addTransactionModal")).hide();
+      bootstrap.Modal.getInstance(
+        document.getElementById("addTransactionModal")
+      ).hide();
       transactionForm.reset();
       fetchTransactions();
+      // Move focus to a safe element outside the modal
+      document.getElementById("addTransaction")?.focus();
     } catch (err) {
       console.error("Submit error:", err);
     }
@@ -171,7 +199,12 @@ document.addEventListener("DOMContentLoaded", () => {
     if (e.target.classList.contains("delete-btn")) {
       if (confirm("Are you sure you want to delete this transaction?")) {
         try {
-          await fetch(`/api/transactions/${id}`, { method: "DELETE" });
+          await fetch(`/api/transactions/${id}`, {
+            method: "DELETE",
+            headers: {
+              "X-CSRFToken": csrfToken, // Add this line
+            },
+          });
           fetchTransactions();
         } catch (err) {
           console.error("Delete failed:", err);
@@ -180,7 +213,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (e.target.classList.contains("edit-btn")) {
-      const tx = allTransactions.find(t => t.id == id);
+      const tx = allTransactions.find((t) => t.id == id);
       if (!tx) return;
 
       document.getElementById("transactionId").value = tx.id;
@@ -189,7 +222,9 @@ document.addEventListener("DOMContentLoaded", () => {
       transactionForm.category_id.value = getCategoryIdByName(tx.category);
       transactionForm.date.value = tx.date;
 
-      const modal = new bootstrap.Modal(document.getElementById("addTransactionModal"));
+      const modal = new bootstrap.Modal(
+        document.getElementById("addTransactionModal")
+      );
       modal.show();
     }
   });
@@ -197,14 +232,14 @@ document.addEventListener("DOMContentLoaded", () => {
   exportCsvBtn.addEventListener("click", () => {
     const csvContent = [
       ["Date", "Description", "Amount", "Category"],
-      ...allTransactions.map(tx => [
+      ...allTransactions.map((tx) => [
         tx.date,
         `"${tx.description}"`,
         tx.amount,
-        tx.category
-      ])
+        tx.category,
+      ]),
     ]
-      .map(e => e.join(","))
+      .map((e) => e.join(","))
       .join("\n");
 
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
@@ -227,7 +262,9 @@ document.addEventListener("DOMContentLoaded", () => {
         body: formData,
       });
       if (!res.ok) throw new Error("Failed to import CSV");
-      bootstrap.Modal.getInstance(document.getElementById("importCsvModal")).hide();
+      bootstrap.Modal.getInstance(
+        document.getElementById("importCsvModal")
+      ).hide();
       importCsvForm.reset();
       fetchTransactions();
     } catch (err) {

@@ -98,6 +98,8 @@ endblock %} {% block content %}
   <div class="modal-dialog">
     <div class="modal-content">
       <form id="transactionForm" class="p-3">
+        <!-- Add CSRF token -->
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div class="modal-header">
           <h5 class="modal-title" id="addTransactionModalLabel">
             Add Transaction
@@ -172,6 +174,8 @@ endblock %} {% block content %}
       enctype="multipart/form-data"
       class="modal-content p-3"
     >
+      <!-- Add CSRF token -->
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
       <div class="modal-header">
         <h5 class="modal-title">Import Transactions from CSV</h5>
         <button

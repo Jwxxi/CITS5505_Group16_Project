@@ -20,6 +20,7 @@ from io import StringIO
 from flask import Response
 import json
 import traceback
+from flask_wtf.csrf import CSRFProtect
 
 # Backend functionality for CSV Export and Import
 from flask import send_file
@@ -31,6 +32,7 @@ app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///expense-tracker.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.secret_key = os.urandom(24)
+csrf = CSRFProtect(app)
 
 # Initialize extensions
 db.init_app(app)
