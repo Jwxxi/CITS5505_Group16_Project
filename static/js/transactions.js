@@ -186,6 +186,8 @@ document.addEventListener("DOMContentLoaded", () => {
       ).hide();
       transactionForm.reset();
       fetchTransactions();
+      // Move focus to a safe element outside the modal
+      document.getElementById("addTransaction")?.focus();
     } catch (err) {
       console.error("Submit error:", err);
     }
@@ -197,7 +199,12 @@ document.addEventListener("DOMContentLoaded", () => {
     if (e.target.classList.contains("delete-btn")) {
       if (confirm("Are you sure you want to delete this transaction?")) {
         try {
-          await fetch(`/api/transactions/${id}`, { method: "DELETE" });
+          await fetch(`/api/transactions/${id}`, {
+            method: "DELETE",
+            headers: {
+              "X-CSRFToken": csrfToken, // Add this line
+            },
+          });
           fetchTransactions();
         } catch (err) {
           console.error("Delete failed:", err);

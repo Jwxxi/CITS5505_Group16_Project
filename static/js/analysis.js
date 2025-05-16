@@ -1,11 +1,11 @@
 // static/js/analysis.js
 
-document.addEventListener("DOMContentLoaded", () => {
-  // Get CSRF token from meta tag
-  const csrfToken = document
-    .querySelector('meta[name="csrf-token"]')
-    .getAttribute("content");
+// Move CSRF token extraction here so it's available everywhere
+const csrfToken = document
+  .querySelector('meta[name="csrf-token"]')
+  .getAttribute("content");
 
+document.addEventListener("DOMContentLoaded", () => {
   const typeSelect = document.getElementById("analysisType");
   const yearSelect = document.getElementById("analysisYear");
   const monthSelect = document.getElementById("analysisMonth");
@@ -213,6 +213,8 @@ document.addEventListener("DOMContentLoaded", function () {
             document.getElementById("shareAnalysisModal")
           );
           modal.hide();
+          // Move focus to a safe element after modal closes
+          document.getElementById("applyAnalysisFilter")?.focus();
         }, 1500);
       } else {
         msgDiv.className = "alert alert-danger";
