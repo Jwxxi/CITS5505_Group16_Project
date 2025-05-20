@@ -179,7 +179,7 @@ class TestExpenseTracker(unittest.TestCase):
         
         # Verify if update is successful
         with app.app_context():
-            updated_item = Item.query.get(transaction_id)
+            updated_item = db.session.get(Item, transaction_id)
             self.assertEqual(updated_item.description, "Updated Description")
             self.assertEqual(updated_item.amount, 600.0)
     
@@ -206,7 +206,7 @@ class TestExpenseTracker(unittest.TestCase):
         
         # Verify if deletion is successful
         with app.app_context():
-            deleted_item = Item.query.get(transaction_id)
+            deleted_item = db.session.get(Item, transaction_id)
             self.assertIsNone(deleted_item)
     
     # Test analysis functionality
@@ -361,7 +361,7 @@ class TestExpenseTracker(unittest.TestCase):
         
         # Verify if update is successful
         with app.app_context():
-            updated_user = User.query.get(self.user_id)
+            updated_user = db.session.get(User, self.user_id)
             self.assertEqual(updated_user.name, "Updated Name")
 
 
