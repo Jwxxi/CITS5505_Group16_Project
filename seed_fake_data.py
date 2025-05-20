@@ -59,10 +59,46 @@ def seed_items_for_user(user, entries_per_month=3):
                     db.session.add(item)
     db.session.commit()
 
+def get_income_description(cat_name):
+    phrases = {
+        "Salary & Wages": "Monthly salary received",
+        "Bonuses & Commissions": "Performance bonus",
+        "Business or Freelance Income": "Freelance project payment",
+        "Rental & Property Income": "Rental income received",
+        "Investment Income": "Stock dividends",
+        "Other Income": "Miscellaneous income"
+    }
+    return phrases.get(cat_name, f"{cat_name} income")
+
+def get_expense_description(cat_name):
+    phrases = {
+        "Housing": "Paid monthly rent",
+        "Utilities & Services": "Paid electricity bill",
+        "Food & Groceries": "Bought groceries",
+        "Transportation": "Public transport fare",
+        "Insurance": "Health insurance premium",
+        "Healthcare & Medical": "Doctor visit",
+        "Debt Payments": "Credit card payment",
+        "Savings & Investments": "Transferred to savings",
+        "Personal & Discretionary": "Personal shopping",
+        "Entertainment & Leisure": "Movie night",
+        "Education & Development": "Online course fee",
+        "Household Supplies & Maintenance": "Bought cleaning supplies",
+        "Taxes & Fees": "Paid annual taxes",
+        "Miscellaneous": "Miscellaneous expense"
+    }
+    return phrases.get(cat_name, f"{cat_name} expense")
+
 if __name__ == "__main__":
     with app.app_context():
-        user1 = seed_user("davema0522@gmail.com", "Dave Ma", "password123")
-        user2 = seed_user("jaminma_0522@163.com", "Jamin Ma", "password123")
-        seed_items_for_user(user1, entries_per_month=3)
-        seed_items_for_user(user2, entries_per_month=3)
-        print("Fake data seeded for both users, all categories, all months, last 3 years, multiple entries per month.")
+        users = [
+            ("davema0522@gmail.com", "Dave Ma", "password123"),
+            ("jaminma_0522@163.com", "Jamin Ma", "password123"),
+            ("24254189@student.uwa.edu.au", "Anandhu", "password123"),
+            ("24071442@student.uwa.edu.au", "Jiawen", "password123"),
+            ("23901307@student.uwa.edu.au", "Peiyu", "password123"),
+        ]
+        for email, name, password in users:
+            user = seed_user(email, name, password)
+            seed_items_for_user(user, entries_per_month=3)
+        print("Fake data seeded for 5 users, all categories, all months, last 3 years, multiple entries per month.")

@@ -51,7 +51,7 @@ with app.app_context():
 # =====================
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(int(user_id))
+    return db.session.get(User, int(user_id))
 
 
 # =====================
@@ -188,7 +188,7 @@ def get_transactions():
 def add_transaction():
     data = request.json
     category_id = data.get("category_id")
-    category = Category.query.get(category_id)
+    category = db.session.get(Category, category_id)
     if not category:
         return jsonify({"error": "Invalid category"}), 400
 
@@ -515,3 +515,4 @@ def check_items_exist():
 
 if __name__ == "__main__":
     app.run(debug=True)
+
