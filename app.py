@@ -166,7 +166,7 @@ def edit_profile():
 @app.route("/api/transactions", methods=["GET"])
 @login_required
 def get_transactions():
-    items = Item.query.filter_by(user_id=current_user.id).all()
+    items = Item.query.filter_by(user_id=current_user.id).order_by(Item.created_at.desc()).all()
     transactions = []
     for item in items:
         transactions.append(
